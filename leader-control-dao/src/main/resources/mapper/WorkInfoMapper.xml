@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IWorkInfoMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.WorkInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
+    <result column="content_url" property="contentUrl" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+  </resultMap> -->
+  <sql id="Base_Column_List" >
+    id, title, pic_url, content_url, create_at
+  </sql>
+  
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.WorkInfo">
+		SELECT w.*
+		FROM work_info w
+		WHERE
+		w.id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		w.title LIKE CONCAT('%',#{keyword},'%')
+		OR
+		w.pic_url LIKE CONCAT('%',#{keyword},'%')
+		OR
+		w.content_url LIKE CONCAT('%',#{keyword},'%')
+		OR
+		w.create_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	</select>
+
+</mapper>

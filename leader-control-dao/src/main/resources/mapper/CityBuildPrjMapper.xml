@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ICityBuildPrjMapper" >
+  
+  <sql id="Base_Column_List" >
+    id, prj_db_no, current_plan_no, prj_start_year, prj_end_year, actual_end_date, prj_invest_total, 
+    remark, create_at, update_at
+  </sql>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CityBuildPrjRow">
+  	SELECT c.*, IFNULL(c.is_deleted, 0), p.full_name prjDbNoTrans, d.value_remark currentPlanNoTrans
+  	FROM city_build_prj c
+  	LEFT JOIN dic_info d ON c.current_plan_no = d.id
+  	LEFT JOIN prj_info p ON c.prj_db_no = p.id
+  	WHERE c.is_deleted = 0 OR c.is_deleted IS NULL
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CityBuildPrjRow">
+  	SELECT c.*, IFNULL(c.is_deleted, 0), p.full_name prjDbNoTrans, d.value_remark currentPlanNoTrans
+  	FROM city_build_prj c
+  	LEFT JOIN dic_info d ON c.current_plan_no = d.id
+  	LEFT JOIN prj_info p ON c.prj_db_no = p.id
+  	WHERE 
+  	(c.is_deleted = 0 OR c.is_deleted IS NULL)
+  	AND
+  	(
+  	c.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.prj_db_no LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.current_plan_no LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.prj_content LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.prj_start_year LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.prj_end_year LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.actual_start_date LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+  	c.actual_end_date LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+  	c.prj_invest_total LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	c.create_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+  	c.update_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+  	p.full_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	d.value_remark LIKE CONCAT('%',#{keyword},'%')
+  	)
+  </select>
+  
+</mapper>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IOrgUserMapper" >
+  <resultMap id="SearchResultMap" type="org.zxs.leader.control.dao.model.vo.output.PrcSearchOut" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="real_name" property="value" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="type_dis" property="typeDis" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, login_name, password, real_name, position, mobile_phone, avatar, level, role, 
+    org_id, create_at, update_at
+  </sql>
+  
+  <sql id="Login_Column_List" >
+    u.id userId, u.login_name loginName, u.real_name username, u.position, u.avatar, u.level level, o.full_name orgName, 
+    if(v.totalNum > 0 or u.level = 1, 1, 0) hasLdPrj, if(p.id is null and u.level != 1, 0, 1) hasCbPrj, if(count(c.prj_id) > 0 or u.level = 1, 1, 0) isPrjLeader
+  </sql>
+  
+  <sql id="Login_Column_Table" >
+    org_user u LEFT JOIN org_unit o on u.org_id = o.id
+  	LEFT JOIN ld_prj_statics_view v on u.id = v.userId
+  	LEFT JOIN cb_plan_prj p on u.id = p.rsp_leader_id
+  	LEFT JOIN prj_contact c on u.id = c.user_id and c.type in (20801, 20802)
+  </sql>
+  
+  <!-- <select id="selectByLoginNameAndPsw" parameterType="org.zxs.leader.control.dao.model.vo.query.OrgUserQuery" resultType="org.zxs.leader.control.dao.model.OrgUser">
+  	SELECT <include refid="Base_Column_List"/>
+  	FROM org_user
+  	WHERE login_name = #{record.loginName}
+  	AND password = MD5(CONCAT(#{record.inputPsw},DATE_FORMAT(update_at,'%Y-%m-%d %T')))
+  	limit 1;
+  </select> -->
+  
+  <select id="selectLoginInfoByLoginNameAndPsw" parameterType="org.zxs.leader.control.dao.model.vo.query.OrgUserQuery"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.LoginUserOut">
+  	SELECT <include refid="Login_Column_List"/>
+  	FROM <include refid="Login_Column_Table"/>
+  	WHERE u.login_name = #{record.loginName}
+  	<if test="record.inputPsw != null">
+  		AND u.password = MD5(CONCAT(#{record.inputPsw},DATE_FORMAT(u.update_at,'%Y-%m-%d %T')))
+  	</if>
+  	GROUP BY u.id
+  	ORDER BY u.level,u.order_by,u.create_at,u.id
+  </select>
+  
+  <select id="selectLeaderPrjByNameLike" parameterType="string" resultMap="SearchResultMap">
+  	SELECT distinct u.id, u.real_name, 2 as type, '按领导人名' as type_dis
+  	FROM org_user u JOIN prj_contact c ON u.id = c.user_id and c.type <![CDATA[<]]> 20805
+  	WHERE u.real_name like "%"#{nameLike}"%"
+  	ORDER BY u.level,u.order_by,u.create_at,u.id
+  </select>
+  
+  <select id="selectCbLeaderByNameLike" parameterType="string" resultMap="SearchResultMap">
+  	SELECT u.id, u.real_name, 2 as type, '按领导人名' as type_dis
+  	FROM org_user u
+  	WHERE u.real_name like "%"#{nameLike}"%"
+  	AND u.id in (SELECT distinct rsp_leader_id FROM cb_plan_prj)
+  	ORDER BY u.level,u.order_by,u.create_at,u.id;
+  </select>
+  
+  <select id="selectLoginInfoById" resultType="org.zxs.leader.control.dao.model.vo.output.LoginUserOut">
+  	SELECT <include refid="Login_Column_List"/>
+  	FROM <include refid="Login_Column_Table"/>
+  	WHERE u.id = #{id}
+  	<if test="password != null">
+  		AND u.password = MD5(CONCAT(#{password},DATE_FORMAT(u.update_at,'%Y-%m-%d %T')))
+  	</if>
+  	GROUP BY u.id
+  </select>
+  
+  <select id="selectNameInRow" resultType="string">
+  	SELECT GROUP_CONCAT(real_name) FROM org_user
+  	<where>
+        <foreach collection="list" open=" id in(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </where>
+    ORDER BY level,order_by,create_at,id
+  </select>
+  
+    <select id="selectPhoneListByType" parameterType="org.zxs.leader.control.dao.model.vo.query.PhoneListQuery"
+    	resultType="org.zxs.leader.control.dao.model.vo.output.SimpleUserOut">
+	  	SELECT u.id userId, u.real_name userName, u.mobile_phone mobilePhone, u.position position, u.create_at createAt, o.full_name orgName
+	  		<if test="query.cgId != null">
+	  			, if(cg.id is null, 0, 1) isInGroup, cg.role role, cg.removeable removeable
+	  		</if>
+	  		<if test="query.userSelected != null and query.userSelected.size() > 0">
+	  			, if(
+	  			<foreach collection="query.userSelected" open=" u.id in (" close=")" item="id" separator=",">
+		            #{id}
+		        </foreach>
+		        , 1, 0) isSelected
+	  		</if>
+	  	FROM org_user u LEFT JOIN org_unit o ON u.org_id = o.id
+	  		<if test="query.cgId != null">
+	  			LEFT JOIN chat_group_user cg on u.id = cg.user_id AND cg.chat_group_id = #{query.cgId}
+	  		</if>
+	  	WHERE u.id != #{query.userId} AND u.level <![CDATA[>=]]> #{query.userLevel}
+  		<if test="query.cgId != null and query.isUserIn == 1">
+  			and u.id in (
+  				SELECT user_id FROM chat_group_user
+  				WHERE chat_group_id = #{query.cgId}
+  			)
+  		</if>
+  		<if test="query.cgId != null and query.isUserIn == 0">
+  			and u.id not in (
+  				SELECT user_id FROM chat_group_user
+  				WHERE chat_group_id = #{query.cgId}
+  			)
+  		</if>
+  		<if test="query.prjId == null">
+  			and u.phone_list_type = #{type}
+  		</if>
+  		<if test="query.prjId != null and query.prjType != 21401">
+  			and u.phone_list_type = #{type}
+  		</if>
+  		<if test="query.prjId != null and query.prjType == 21401">
+  			and u.id in (
+  				<!-- SELECT rsp_leader_id FROM prj_info WHERE id = #{query.prjId}
+  				UNION ALL
+  				SELECT contact_leader_id FROM prj_info WHERE id = #{query.prjId}
+  				UNION ALL
+  				SELECT contact_id FROM prj_info WHERE id = #{query.prjId}
+  				UNION ALL -->
+  				SELECT distinct user_id FROM prj_contact WHERE prj_id = #{query.prjId}
+  				AND type = #{type}
+  			)
+  		</if>
+  		<if test="query.prjId != null and query.prjType == 21403">
+  			<if test="type == 21007">
+  				and u.id in (
+  				SELECT distinct u.id FROM cp_prj_org c left join org_user u on c.org_id = u.org_id
+  				WHERE c.cp_prj_id = #{query.prjId} AND c.prj_type = 21403 AND c.relate_type = 21201
+  				)
+  			</if>
+  		</if>
+  		<if test="query.nameLike != null">
+  			and (u.real_name like "%"#{query.nameLike}"%"
+  			<if test="query.userSelected != null and query.userSelected.size() > 0">
+  				<foreach collection="query.userSelected" open=" or u.id in (" close=")" item="id" separator=",">
+	            	#{id}
+	        	</foreach>
+	        </if>)
+  		</if>
+  		ORDER BY u.level,u.order_by,u.create_at
+	  </select>
+	  
+	  <update id="updatePassword">
+	  	UPDATE org_user
+	  	SET password = MD5(CONCAT(#{pswdNew},DATE_FORMAT(now(),'%Y-%m-%d %T'))), update_at = now()
+	  	WHERE id = #{userId}
+	  </update>
+	 
+	<select id="selectAllRows" resultType="org.zxs.leader.control.dao.model.vo.output.rows.OrgUserRow">
+		SELECT o.*, IFNULL(o.is_deleted, 0) isDeleted, u.full_name orgIdTrans, d.value_remark phoneListTypeTrans
+		FROM org_user o
+		LEFT JOIN org_unit u ON o.org_id = u.id
+		LEFT JOIN dic_info d ON o.phone_list_type = d.id
+		WHERE
+		o.is_deleted = 0 OR o.is_deleted IS NULL
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.OrgUserRow">
+		SELECT o.*, IFNULL(o.is_deleted, 0) isDeleted, u.full_name orgIdTrans, d.value_remark phoneListTypeTrans
+		FROM org_user o
+		LEFT JOIN org_unit u ON o.org_id = u.id
+		LEFT JOIN dic_info d ON o.phone_list_type = d.id
+		WHERE
+		(o.is_deleted = 0 OR o.is_deleted IS NULL) 
+		AND
+		(
+		o.login_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.real_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.position LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.mobile_phone LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		u.full_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		d.value_remark LIKE CONCAT('%',#{keyword},'%')
+		)
+	</select>
+	
+	<select id="selectAllUserIdOpts" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT real_name optText, id optValue
+		FROM org_user
+		WHERE is_deleted = 0 OR is_deleted IS NULL
+	</select>
+	
+</mapper>

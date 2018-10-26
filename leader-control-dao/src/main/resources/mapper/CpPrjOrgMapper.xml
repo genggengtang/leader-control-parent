@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ICpPrjOrgMapper" >
+  <!-- <sql id="Base_Column_List" >
+    id, cp_prj_id, org_id, relate_type
+  </sql> -->
+  
+  <select id="selectPrjOwnerByNameLike" parameterType="string"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.PrcSearchOut">
+  	SELECT id, full_name value, 3 as type, '按业主名' as type_dis
+  	FROM org_unit
+  	WHERE full_name like "%"#{nameLike}"%"
+  	AND id in (
+  		SELECT distinct o.org_id FROM cp_prj_org o LEFT JOIN cb_plan_prj p ON o.cp_prj_id = p.id
+	  	WHERE o.prj_type = 21403
+	  		<if test="planNo != null">
+	  			and p.plan_no = #{planNo}
+	  		</if>
+	  		<if test="isKeyPrj == 1">
+	  			and p.star_num > 0
+	  		</if>
+	  	)
+  	ORDER BY id
+  </select>
+  
+  <select id="selectOwnerListByIdAndPrjType" 
+  		resultType="org.zxs.leader.control.dao.model.vo.output.PrjContactOut">
+  	SELECT if(c.is_mth_org_show = 1, CONCAT(mo.full_name, '(', o.full_name ,')'), o.full_name) orgName, c.contact_name userName, c.contact_phone mobilePhone
+  	FROM cp_prj_org c LEFT JOIN org_unit o ON c.org_id = o.id
+  	LEFT JOIN org_relation r on c.org_id = r.son_org_id
+	LEFT JOIN org_unit mo on r.mth_org_id = mo.id
+  	WHERE c.cp_prj_id = #{id} AND c.prj_type = #{prjType}
+  	AND c.relate_type = 21201
+  	ORDER BY c.id
+  </select>
+  
+  <select id="selectCountByUserAndPrj" resultType="int">
+  	SELECT count(c.id)
+  	FROM cp_prj_org c LEFT JOIN 
+  			(select id, org_id, org_id orgId from org_user
+				UNION ALL select u.id, u.org_id, r.son_org_id orgId
+				from org_user u left join org_relation r on u.org_id = r.mth_org_id where r.id is not null
+			) u on c.org_id = u.orgId 
+	WHERE c.cp_prj_id = #{prjId} and u.id = #{userId} and c.prj_type = 21403
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CpPrjOrgRow">
+	SELECT c.*, d1.value_remark prjTypeTrans, p.full_name cpPrjIdTrans, o.full_name orgIdTrans, d2.value_remark relateTypeTrans
+	FROM cp_prj_org c
+	LEFT JOIN dic_info d1 ON c.prj_type = d1.id
+	LEFT JOIN prj_info p ON c.cp_prj_id = p.id
+	LEFT JOIN org_unit o ON c.org_id = o.id
+	LEFT JOIN dic_info d2 ON c.relate_type = d2.id
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CpPrjOrgRow">
+  	SELECT c.*, d1.value_remark prjTypeTrans, p.full_name cpPrjIdTrans, o.full_name orgIdTrans, d2.value_remark relateTypeTrans
+	FROM cp_prj_org c
+	LEFT JOIN dic_info d1 ON c.prj_type = d1.id
+	LEFT JOIN prj_info p ON c.cp_prj_id = p.id
+	LEFT JOIN org_unit o ON c.org_id = o.id
+	LEFT JOIN dic_info d2 ON c.relate_type = d2.id
+	WHERE
+	c.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.contact_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.contact_phone LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d1.value_remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+	p.full_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	o.full_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d2.value_remark LIKE CONCAT('%',#{keyword},'%')
+  </select>
+  
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IChatGroupMsgMapper" >
+  
+  <select id="selectLatestMsgHis" parameterType="org.zxs.leader.control.dao.model.vo.query.MsgHisQuery"
+  	resultType="org.zxs.leader.control.dao.model.vo.output.ChatMsgOut">
+  	SELECT id msgId, from_id userId, from_name userName, content msgContent, DATE_FORMAT(create_at, "%Y-%m-%d %H:%i:%s") msgAt,
+  	chat_type shMsgType, user_ids sUserIds, user_names sUserNames, user_cnt shUserNum, file_name fileName, file_url fileUrl, relate_id topicId,
+  	if(from_id = #{query.userId}, 1, 0) isSelf
+  	FROM chat_group_msg
+  	<where>
+  		<if test="query.cgId != null">
+  			chat_group_id = #{query.cgId}
+  		</if>
+  		<if test="query.msgId != null">
+  			and id <![CDATA[<]]> #{query.msgId}
+  		</if>
+  	</where>
+  	ORDER BY create_at desc
+  	limit #{query.num};
+  </select>
+  
+  <select id="selectUnpushSysMsg" resultType="string">
+  	SELECT m.content msgContent
+  	FROM chat_group_msg m LEFT JOIN msg_status s ON m.id = s.group_msg_id
+  	WHERE s.user_id = #{userId} AND s.push_status = 0 AND m.chat_group_id = 0
+  	ORDER BY m.create_at desc
+  </select>
+</mapper>

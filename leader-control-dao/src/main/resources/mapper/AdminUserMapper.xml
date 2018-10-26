@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IAdminUserMapper" >
+  
+  <sql id="Base_Column_List" >
+    id, login_name, nick_name, avatar, admin_group, role, create_at, update_at
+  </sql>
+  
+  <select id="selectByLoginNameAndPassword" resultType="org.zxs.leader.control.dao.model.vo.output.AdminUserOut">
+	SELECT <include refid="Base_Column_List"/>
+	FROM admin_user
+	WHERE login_name = #{loginName}
+	AND password = MD5(CONCAT(#{password}, DATE_FORMAT(create_at,'%Y-%m-%d %T'), DATE_FORMAT(update_at,'%Y-%m-%d %T')))
+  </select>
+  
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ILeaderGroupMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.LeaderGroup" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="update_at" property="updateAt" jdbcType="TIMESTAMP" />
+  </resultMap> -->
+  
+  <sql id="Base_Column_List" >
+    id, user_id, short_name, create_at, update_at
+  </sql>
+  
+  <select id="selectLeaderList" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+  	SELECT l.user_id optValue, u.real_name optText
+  	FROM leader_group l LEFT JOIN org_user u ON l.user_id = u.id
+  	ORDER BY u.order_by
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.LeaderGroupRow">
+  	SELECT l.*, IFNULL(l.is_deleted, 0) isDeleted, c.group_name cgIdTrans, u.real_name userIdTrans
+  	FROM leader_group l
+  	LEFT JOIN chat_group_info c ON l.cg_id = c.id
+  	LEFT JOIN org_user u ON l.user_id = u.id 
+  	WHERE l.is_deleted = 0 OR l.is_deleted IS NULL
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.LeaderGroupRow">
+  	SELECT l.*, IFNULL(l.is_deleted, 0) isDeleted, c.group_name cgIdTrans, u.real_name userIdTrans
+  	FROM leader_group l
+  	LEFT JOIN chat_group_info c ON l.cg_id = c.id
+  	LEFT JOIN org_user u ON l.user_id = u.id 
+  	WHERE 
+  	(l.is_deleted = 0 OR l.is_deleted IS NULL)
+  	AND
+  	(
+  	l.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	l.name LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	l.create_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+  	l.update_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+	c.group_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	u.real_name LIKE CONCAT('%',#{keyword},'%')
+  	)
+  </select>
+
+</mapper>

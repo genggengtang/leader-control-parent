@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ITopicPicMapper" >
+  
+  <sql id="Base_Column_List" >
+    t.id id, t.send_user_id sendUserId, t.receive_cg_id receiveCgId, t.is_new_group isNewGroup, t.content content, t.pic_url picUrl, 
+     t.reply_status replyStatus, t.active_status activeStatus, t.create_at createAt, t.update_at updateAt
+  </sql>
+  
+  <select id="selectTopicByUser" parameterType="int" resultType="org.zxs.leader.control.dao.model.vo.output.TopicPicOut">
+  	SELECT <include refid="Base_Column_List"/>, u.real_name sendUserName, cg.group_name receiveCgName, left(t.content, 40) contentSub,
+  		t.commentNum commentNum, count(distinct tu.id) unreadNum, if(t.send_user_id = #{userId}, 1, 0) isAuthor, if(t.reply_status = 0, '未回复', '已回复') commentStatus,
+  		GROUP_CONCAT(distinct cu.nickname) receiveUserNames
+  	FROM (select p.id, p.receive_cg_id, p.send_user_id, p.is_new_group, p.content, p.update_at, p.pic_url, p.reply_status, p.active_status, p.create_at, count(c.id) commentNum
+  			FROM topic_pic p left join topic_comment c on p.id = c.topic_id GROUP BY p.id) t
+  		join (
+			select id, send_user_id userId from topic_pic union all select topic_id, user_id userId from topic_unread
+		) tp on t.id = tp.id
+		left join org_user u on t.send_user_id = u.id
+		left join chat_group_info cg on t.receive_cg_id = cg.id
+		left join chat_group_user cu on cg.id = cu.chat_group_id and cu.user_id != t.send_user_id
+		left join topic_comment cm on t.id = cm.topic_id and cm.comment_user_id = #{userId}
+		left join topic_unread tu on t.id = tu.topic_id and tp.userId = tu.user_id and tu.read_status = 0
+	WHERE tp.userId = #{userId} AND t.active_status = 1
+	GROUP BY t.id
+	ORDER BY t.update_at desc, t.create_at desc
+  </select>
+  
+  <select id="selectDetailById" resultType="org.zxs.leader.control.dao.model.vo.output.TopicDetailOut">
+  	SELECT <include refid="Base_Column_List"/>, u.real_name sendUserName, cg.group_name receiveCgName, count(distinct cm.id) commentNum,
+  		GROUP_CONCAT(distinct cu.nickname) receiveUserNames
+  	FROM topic_pic t left join org_user u on t.send_user_id = u.id
+		left join chat_group_info cg on t.receive_cg_id = cg.id
+		left join chat_group_user cu on cg.id = cu.chat_group_id and cu.user_id != t.send_user_id
+		left join topic_comment cm on t.id = cm.topic_id
+	WHERE t.id = #{id} AND t.active_status = 1
+	GROUP BY t.id
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.TopicPicRow">
+  	SELECT t.*,  u.real_name sendUserIdTrans, g.group_name receiveCgIdTrans
+  	FROM topic_pic t
+  	LEFT JOIN org_user u ON t.send_user_id = u.id
+  	LEFT JOIN chat_group_info g ON t.receive_cg_id = g.id
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.TopicPicRow">
+  	SELECT t.*,  u.real_name sendUserIdTrans, g.group_name receiveCgIdTrans
+  	FROM topic_pic t
+  	LEFT JOIN org_user u ON t.send_user_id = u.id
+  	LEFT JOIN chat_group_info g ON t.receive_cg_id = g.id
+  	WHERE
+  	t.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	t.is_new_group LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	t.content LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	t.pic_url LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	t.reply_status LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	t.active_status LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	t.create_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+  	t.update_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+	u.real_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	g.group_name LIKE CONCAT('%',#{keyword},'%')
+  </select>
+  
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ICbStaticsMapper" >
+  
+  <!-- <sql id="Base_Column_List" >
+    id, plan_no, plan_name, plan_invest, actual_invest, fund_cost, prj_num, new_prj_num, 
+    extend_prj_num, source_city_finance, source_social, cb_type_no, cb_feature_no, url
+  </sql> -->
+  
+  <select id="selectTypeListByPlan" parameterType="int" resultType="org.zxs.leader.control.dao.model.DicInfo">
+  	SELECT d.id id, d.type type, d.type_remark typeRemark, d.value_remark valueRemark, d.short_remark shortRemark
+  	FROM dic_info d LEFT JOIN cb_statics s ON d.type = s.cb_type_no
+  	WHERE s.plan_no = #{planNo}
+  </select>
+  
+  <select id="selectLabelListByPlan" parameterType="int" resultType="org.zxs.leader.control.dao.model.DicInfo">
+  	SELECT d.id id, d.type type, d.type_remark typeRemark, d.value_remark valueRemark, d.short_remark shortRemark
+  	FROM dic_info d LEFT JOIN cb_statics s ON d.type = s.cb_label_no
+  	WHERE s.plan_no = #{planNo}
+  </select>
+</mapper>

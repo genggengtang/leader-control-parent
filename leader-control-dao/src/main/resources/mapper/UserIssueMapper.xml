@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IUserIssueMapper" >
+  
+  <sql id="Base_Column_List" >
+    id, user_id, title, content, issue_at, status, reply_content, reply_at
+  </sql>
+  <select id="selectIssueListByUser" parameterType="int" resultType="org.zxs.leader.control.dao.model.vo.output.UserIssueOut">
+  	SELECT <include refid="Base_Column_List"/>
+  	FROM user_issue
+  	WHERE user_id = #{userId}
+  	ORDER BY reply_at desc, issue_at desc
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.UserIssueRow">
+  	SELECT u.*, o.real_name userIdTrans
+  	FROM user_issue u
+  	LEFT JOIN org_user o ON u.user_id = o.id
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.UserIssueRow">
+  	SELECT u.*, o.real_name userIdTrans
+  	FROM user_issue u
+  	LEFT JOIN org_user o ON u.user_id = o.id
+  	WHERE
+  	u.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	u.title LIKE CONCAT('%',#{keyword},'%')
+	OR
+	u.content LIKE CONCAT('%',#{keyword},'%')
+	OR
+	u.issue_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+	u.status LIKE CONCAT('%',#{keyword},'%')
+	OR
+	u.reply_content LIKE CONCAT('%',#{keyword},'%')
+	OR
+	u.reply_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+	o.real_name LIKE CONCAT('%',#{keyword},'%')
+  </select>
+  
+</mapper>

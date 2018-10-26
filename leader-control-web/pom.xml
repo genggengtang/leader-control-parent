@@ -1,0 +1,494 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>leader-control-web</artifactId>
+	<packaging>war</packaging>
+
+	<name>leader-control-web</name>
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>org.zxs</groupId>
+		<artifactId>leader-control-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	
+	<properties>
+		<java.version>1.8</java.version>
+		<spring.version>4.3.18.RELEASE</spring.version>
+		<shiro.version>1.2.3</shiro.version>
+		<shrio-redis.version>2.4.2.1-RELEASE</shrio-redis.version>
+		<jedis.version>2.7.2</jedis.version>
+		<fastjson.version>1.2.29</fastjson.version>
+		<commons-collections4.version>4.1</commons-collections4.version>
+	</properties>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>org.zxs</groupId>
+			<artifactId>base-filter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.zxs</groupId>
+			<artifactId>leader-control-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Spring集成Quartz的配置 -->
+		<!-- <dependency> <groupId>org.quartz-scheduler</groupId> <artifactId>quartz</artifactId> 
+			<version>2.2.1</version> </dependency> -->
+		<!-- //Spring集成Quartz的配置 -->
+
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.8.1</version>
+		</dependency>
+
+		<dependency> <groupId>log4j</groupId> <artifactId>log4j</artifactId> 
+			<version>1.2.12</version> <scope>runtime</scope> </dependency>
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>4.3.9.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>net.sf.ehcache</groupId> <artifactId>ehcache-core</artifactId> 
+			<version>2.6.11</version> </dependency> -->
+
+		<!-- Servlet -->
+		<!-- <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>tomcat-servlet-api</artifactId> 
+			<version>7.0.30</version> <scope>provided</scope> </dependency> -->
+		<!-- <dependency> <groupId>javax.servlet.jsp</groupId> <artifactId>jsp-api</artifactId> 
+			<version>2.1</version> <scope>provided</scope> </dependency> <dependency> 
+			<groupId>javax.servlet.jsp.jstl</groupId> <artifactId>jstl-api</artifactId> 
+			<version>1.2</version> <exclusions> <exclusion> <groupId>javax.servlet</groupId> 
+			<artifactId>servlet-api</artifactId> </exclusion> </exclusions> </dependency> 
+			<dependency> <groupId>org.glassfish.web</groupId> <artifactId>jstl-impl</artifactId> 
+			<version>1.2</version> <exclusions> <exclusion> <groupId>javax.servlet</groupId> 
+			<artifactId>servlet-api</artifactId> </exclusion> </exclusions> </dependency> -->
+
+		<!-- Jackson JSON Processor -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.27-incubating</version>
+		</dependency>
+
+		<!-- 错误日志发送 -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.codehaus.janino</groupId> <artifactId>janino</artifactId> 
+			<version>2.5.16</version> </dependency> -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- 测试mock -->
+		<!-- <dependency> <groupId>org.powermock</groupId> <artifactId>powermock-module-junit4</artifactId> 
+			<version>1.7.0</version> <exclusions> <exclusion> <groupId>junit</groupId> 
+			<artifactId>junit</artifactId> </exclusion> <exclusion> <groupId>org.powermock</groupId> 
+			<artifactId>powermock-core</artifactId> </exclusion> <exclusion> <groupId>org.powermock</groupId> 
+			<artifactId>powermock-reflect</artifactId> </exclusion> </exclusions> <scope>test</scope> 
+			</dependency> <dependency> <groupId>org.powermock</groupId> <artifactId>powermock-api-mockito</artifactId> 
+			<version>1.7.0</version> <scope>test</scope> </dependency> -->
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.11</version>
+		</dependency>
+
+		<!-- string to xml -->
+		<!-- <dependency> <groupId>org.dom4j</groupId> <artifactId>dom4j</artifactId> 
+			<version>2.0.0</version> </dependency> -->
+
+		<!-- web service -->
+		<!-- <dependency> <groupId>axis</groupId> <artifactId>axis</artifactId> 
+			<version>1.4</version> </dependency> <dependency> <groupId>org.apache.axis</groupId> 
+			<artifactId>axis-ant</artifactId> <version>1.4</version> </dependency> <dependency> 
+			<groupId>org.apache.axis</groupId> <artifactId>axis-jaxrpc</artifactId> <version>1.4</version> 
+			</dependency>
+		<dependency> <groupId>axis</groupId> <artifactId>axis-wsdl4j</artifactId> 
+			<version>1.5.1</version> </dependency>
+		<dependency> <groupId>wsdl4j</groupId> <artifactId>wsdl4j</artifactId> 
+			<version>1.6.2</version> </dependency> <dependency> <groupId>org.glassfish</groupId> 
+			<artifactId>javax.xml.rpc</artifactId> <version>3.1.1</version> </dependency> -->
+
+		<!-- -->
+		<!-- <dependency> <groupId>org.apache.shiro</groupId> <artifactId>shiro-core</artifactId> 
+			<version>${shiro.version}</version> </dependency> <dependency> <groupId>org.apache.shiro</groupId> 
+			<artifactId>shiro-spring</artifactId> <version>${shiro.version}</version> 
+			</dependency> <dependency> <groupId>org.crazycake</groupId> <artifactId>shiro-redis</artifactId> 
+			<version>${shrio-redis.version}</version> </dependency> -->
+		<!-- <dependency> <groupId>redis.clients</groupId> <artifactId>jedis</artifactId> 
+			<version>${jedis.version}</version> </dependency> -->
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.springframework.data</groupId> <artifactId>spring-data-redis</artifactId> 
+			<version>1.8.4.RELEASE</version> </dependency> -->
+
+		<!-- 构建Restful API -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.6.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.socket</groupId>
+			<artifactId>socket.io-client</artifactId>
+			<version>0.6.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		
+		<!-- <dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <version>2.5.0</version>
+</dependency> -->
+
+		<!-- <dependency>
+			<groupId>com.gexin.platform</groupId>
+			<artifactId>gexin-rp-sdk-http</artifactId>
+			<version>4.0.1.17</version>
+		</dependency> -->
+		
+		<!-- HTML解析 -->
+		<dependency>
+		    <groupId>org.jsoup</groupId>
+		    <artifactId>jsoup</artifactId>
+		    <version>1.11.2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>eu.bitwalker</groupId>
+		    <artifactId>UserAgentUtils</artifactId>
+		    <version>1.20</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.17</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>3.17</version>
+ 		</dependency>
+ 		
+ 		<dependency>
+    		<groupId>org.apache.poi</groupId>
+    		<artifactId>poi-ooxml-schemas</artifactId>
+		    <version>3.17</version>
+ 		</dependency>
+		
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<!-- 本地开发环境 -->
+			<id>local</id>
+			<properties>
+				<profiles.active>local</profiles.active>
+
+				<redis.host>localhost</redis.host>
+				<redis.port>6379</redis.port>
+				<redis.password>foobared</redis.password>
+
+				<socketio.hostname>10.17.76.222</socketio.hostname>
+				<socketio.port>9098</socketio.port>
+				<server.pre>http://localhost:8080/leader-control-web/</server.pre>
+				<final.name>${project.artifactId}</final.name>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<!-- 测试环境 -->
+			<id>test</id>
+			<properties>
+				<profiles.active>test</profiles.active>
+
+				<redis.host>10.18.104.146</redis.host>
+				<redis.port>6379</redis.port>
+				<redis.password>foobared</redis.password>
+
+				<socketio.hostname>10.18.104.146</socketio.hostname>
+				<socketio.port>9098</socketio.port>
+				
+				<server.pre>http://10.18.104.146:8801/leader-control-web/</server.pre>
+				<final.name>${project.artifactId}</final.name>
+			</properties>
+		</profile>
+		<profile>
+			<!-- 生产环境 145 -->
+			<id>pro145</id>
+			<properties>
+				<profiles.active>pro145</profiles.active>
+
+				<redis.host>10.18.104.145</redis.host>
+				<redis.port>6679</redis.port>
+				<redis.password>zxs2018</redis.password>
+
+				<socketio.hostname>10.18.104.145</socketio.hostname>
+				<socketio.port>9092</socketio.port>
+				
+				<server.pre>http://116.10.194.123:8808/leader-control-web/</server.pre>
+				<final.name>${project.artifactId}</final.name>
+			</properties>
+		</profile>
+		<profile>
+			<!-- 生产环境 146 -->
+			<id>pro146</id>
+			<properties>
+				<profiles.active>pro146</profiles.active>
+
+				<redis.host>10.18.104.145</redis.host>
+				<redis.port>6679</redis.port>
+				<redis.password>zxs2018</redis.password>
+
+				<socketio.hostname>10.18.104.146</socketio.hostname>
+				<socketio.port>9092</socketio.port>
+				
+				<server.pre>http://116.10.194.123:8808/leader-control-web/</server.pre>
+				<final.name>${project.artifactId}</final.name>
+			</properties>
+		</profile>
+		
+		<profile>
+			<!-- NEW TEST环境 -->
+			<id>new-test</id>
+			<properties>
+				<profiles.active>new-test</profiles.active>
+
+				<redis.host>10.18.155.161</redis.host>
+				<redis.port>6379</redis.port>
+				<redis.password>foobared</redis.password>
+
+				<socketio.hostname>10.18.155.161</socketio.hostname>
+				<socketio.port>9298</socketio.port>
+				
+				<server.pre>http://10.18.155.161:8080/leader-control-new/</server.pre>
+				<final.name>leader-control-new</final.name>
+			</properties>
+		</profile>
+		
+		<profile>
+			<!-- DEMO TEST环境 -->
+			<id>demo-test</id>
+			<properties>
+				<profiles.active>demo-test</profiles.active>
+
+				<redis.host>10.18.104.146</redis.host>
+				<redis.port>6379</redis.port>
+				<redis.password>foobared</redis.password>
+
+				<socketio.hostname>10.18.104.146</socketio.hostname>
+				<socketio.port>9298</socketio.port>
+				
+				<server.pre>http://10.18.104.146:8919/leader-control-demo/</server.pre>
+				<final.name>leader-control-demo</final.name>
+			</properties>
+		</profile>
+		
+		<profile>
+			<!-- DEMO PRO环境 -->
+			<id>demo-pro</id>
+			<properties>
+				<profiles.active>demo-pro</profiles.active>
+
+				<redis.host>10.18.104.146</redis.host>
+				<redis.port>6379</redis.port>
+				<redis.password>foobared</redis.password>
+
+				<socketio.hostname>10.18.104.145</socketio.hostname>
+				<socketio.port>9292</socketio.port>
+				
+				<server.pre>http://116.10.194.123:8989/leader-control-demo/</server.pre>
+				<final.name>leader-control-demo</final.name>
+			</properties>
+		</profile>
+	</profiles>
+
+	<build>
+		<finalName>${final.name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<!-- 乱码设置 -->
+					<forkMode>once</forkMode>
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
+					<excludes>
+						<exclude>**/Abstract*.java</exclude>
+					</excludes>
+					<junitArtifactName>junit:junit</junitArtifactName>
+					<argLine>-Xmx512m</argLine>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+				<!-- Have to use version 1.2 since version 1.3 does not appear to work 
+					with ITDs -->
+				<version>1.2</version>
+				<dependencies>
+					<!-- You must use Maven 2.0.9 or above or these are ignored (see MNG-2972) -->
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjrt</artifactId>
+						<version>1.8.1</version>
+					</dependency>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjtools</artifactId>
+						<version>1.8.1</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>test-compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outxml>true</outxml>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.0.6.v20130930</version>
+				<configuration>
+					<webApp>
+						<contextPath>/${project.artifactId}</contextPath>
+					</webApp>
+				</configuration>
+			</plugin>
+			
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>*.xml</include>
+					<include>*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/spring</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>*.xml</include>
+				</includes>
+				<targetPath>spring</targetPath>
+			</resource>
+		</resources>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>maven-nexus</id>
+			<url>http://central.maven.org/maven2/</url>
+		</repository>
+		
+		<repository>
+			<id>getui-nexus</id>
+			<url>http://mvn.gt.igexin.com/nexus/content/repositories/releases/</url>
+		</repository>
+	</repositories>
+</project>

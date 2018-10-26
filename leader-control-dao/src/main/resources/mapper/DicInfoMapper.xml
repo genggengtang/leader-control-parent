@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IDicInfoMapper" >
+<!--   <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.DicInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="SMALLINT" />
+    <result column="type_remark" property="typeRemark" jdbcType="VARCHAR" />
+    <result column="value_remark" property="valueRemark" jdbcType="VARCHAR" />
+  </resultMap> -->
+  
+	<sql id="Base_Column_List" >
+	  id, type, type_remark, value_remark
+	</sql>
+  
+	<select id="selectAllOrgTypeOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT value_remark optText, id optValue
+		FROM dic_info
+		WHERE type = 202;
+	</select>
+	
+	<select id="selectAllPhoneListTypeOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT value_remark optText, id optValue
+		FROM dic_info
+		WHERE type = 210;
+	</select>
+	
+	<select id="selectOptionsByType" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT value_remark optText, id optValue
+		FROM dic_info
+		WHERE type = #{type};
+	</select>
+	
+	<select id="selectOptionsById" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT value_remark optText, id optValue
+		FROM dic_info
+		WHERE id = #{id};
+	</select>
+  
+</mapper>

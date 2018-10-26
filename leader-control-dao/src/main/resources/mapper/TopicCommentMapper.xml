@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zxs.leader.control.dao.interf.ITopicCommentMapper">
+  
+  <sql id="Base_Column_List">
+    t.id id, t.topic_id topicId, t.comment_user_id commentUserId, t.content content, t.create_at createAt
+  </sql>
+  
+  <select id="selectByTopic" parameterType="int" resultType="org.zxs.leader.control.dao.model.vo.output.TopicCommentOut">
+  	SELECT <include refid="Base_Column_List"/>, u.real_name commentUserName
+  	FROM topic_comment t LEFT JOIN org_user u ON t.comment_user_id = u.id
+  	WHERE t.topic_id = #{topicId}
+  	ORDER BY t.create_at desc
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.TopicCommentRow">
+  	SELECT t.*, u.real_name commentUserIdTrans
+  	FROM topic_comment t
+  	LEFT JOIN org_user u ON t.comment_user_id = u.id
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.TopicCommentRow">
+  	SELECT t.*, u.real_name commentUserIdTrans
+  	FROM topic_comment t
+  	LEFT JOIN org_user u ON t.comment_user_id = u.id
+  	WHERE
+  	t.id LIKE CONCAT('%',#{keyword},'%')
+  	OR
+  	t.topic_id LIKE CONCAT('%',#{keyword},'%')
+  	OR
+  	t.content LIKE CONCAT('%',#{keyword},'%')
+  	OR
+  	t.create_at LIKE BINARY CONCAT('%',#{keyword},'%')
+  	OR
+  	u.real_name LIKE CONCAT('%',#{keyword},'%')
+  </select>
+  
+</mapper>

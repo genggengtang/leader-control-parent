@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjPointMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.PrjPoint" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="prj_line_id" property="prjLineId" jdbcType="INTEGER" />
+    <result column="lng" property="lng" jdbcType="DECIMAL" />
+    <result column="lat" property="lat" jdbcType="DECIMAL" />
+  </resultMap> -->
+  
+  <!-- <sql id="Base_Column_List" >
+    id, prj_line_id, lng, lat
+  </sql> -->
+  
+	<select id="selectAllRows" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjPointRow">
+		SELECT p.*, l.remark prjLineIdTrans
+		FROM prj_point p
+		LEFT JOIN prj_map_line l ON p.prj_line_id = l.id
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjPointRow">
+		SELECT p.*, l.remark prjLineIdTrans
+		FROM prj_point p
+		LEFT JOIN prj_map_line l ON p.prj_line_id = l.id
+		WHERE
+		p.id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.lng LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.lat LIKE CONCAT('%',#{keyword},'%')
+		OR
+		l.remark LIKE CONCAT('%',#{keyword},'%')
+	</select>
+    
+</mapper>

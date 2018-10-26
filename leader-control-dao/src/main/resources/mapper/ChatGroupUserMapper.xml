@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IChatGroupUserMapper" >
+  
+  <select id="selectMembersByGroupId" resultType="org.zxs.leader.control.dao.model.vo.output.SimpleUserOut">
+  	SELECT user_id userId, nickname userName, create_at createAt, role, removeable
+  	FROM chat_group_user
+  	WHERE chat_group_id = #{cgId} AND role > 0
+  	ORDER BY create_at,id
+  </select>
+
+  <select id="selectUserNameWithoutRemoveArray" resultType="string">
+  	SELECT GROUP_CONCAT(c.nickname) FROM chat_group_user c LEFT JOIN org_user u on c.user_id = u.id
+  	WHERE c.chat_group_id = #{cgId}
+        <foreach collection="removeList" open=" and c.user_id not in(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    ORDER BY u.level, u.order_by, u.create_at, c.id
+  </select>
+  
+  <select id="selectUserIdByCgId" resultType="int">
+  	SELECT user_id FROM chat_group_user
+  	WHERE chat_group_id = #{cgId}
+        <if test="selfId != null">
+        	and user_id != #{selfId}
+        </if>
+  </select>
+  
+	<select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.ChatGroupUserRow">
+		SELECT u.*, g.group_name chatGroupIdTrans
+		FROM chat_group_user u
+		LEFT JOIN chat_group_info g ON u.chat_group_id = g.id
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.ChatGroupUserRow">
+		SELECT u.*, g.group_name chatGroupIdTrans
+		FROM chat_group_user u
+		LEFT JOIN chat_group_info g ON u.chat_group_id = g.id
+		WHERE
+		(
+		u.id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		u.chat_group_id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		u.user_id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		u.nickname LIKE CONCAT('%',#{keyword},'%')
+		OR
+		u.role LIKE CONCAT('%',#{keyword},'%')
+		OR
+		g.group_name LIKE CONCAT('%',#{keyword},'%')
+		)
+	</select>
+  
+</mapper>

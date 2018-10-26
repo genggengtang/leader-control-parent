@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjYearPlanMapper" >
+  
+  <!-- <select id="selectCompleteStatusById" resultType="string">
+  	SELECT  
+		CASE
+		  	WHEN if(accm_plan_invest=0, null, accm_actual_invest * 100 DIV accm_plan_invest) is null THEN '其他' 
+		  	WHEN if(accm_plan_invest=0, null, accm_actual_invest * 100 DIV accm_plan_invest) <![CDATA[>]]> 105 THEN '超前'
+		  	WHEN if(accm_plan_invest=0, null, accm_actual_invest * 100 DIV accm_plan_invest) between 95 and 105 THEN '正常'
+		  	WHEN if(accm_plan_invest=0, null, accm_actual_invest * 100 DIV accm_plan_invest) <![CDATA[<]]> 95 THEN '滞后'
+		END completeStatusDis
+	FROM prj_year_plan
+  	WHERE prj_id = #{prjId} AND prj_type = #{prjType} AND year = DATE_FORMAT(NOW(), '%Y')
+  	limit 1;
+  </select> -->
+  
+	<select id="selectYearListByPrj" resultType="org.zxs.leader.control.dao.model.PrjYearPlan">
+		SELECT id, prj_type prjType, prj_id prjId, year, plan_invest planInvest, plan_content planContent, 
+		 actual_content actualContent, create_at createAt, update_at updateAt
+		FROM prj_year_plan
+		WHERE prj_id = #{prjId} AND prj_type = #{prjType}
+		ORDER BY year desc
+	</select>
+  
+	<select id="selectAllSoft" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjYearPlanRow">
+		SELECT p.*, IFNULL(p.is_deleted, 0) isDeleted, d.value_remark prjTypeTrans
+		FROM prj_year_plan p
+		LEFT JOIN dic_info d ON p.prj_type = d.id
+		WHERE
+		p.is_deleted = 0 OR p.is_deleted IS NULL
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjYearPlanRow">
+		SELECT p.*, IFNULL(p.is_deleted, 0) isDeleted, d.value_remark prjTypeTrans
+		FROM prj_year_plan p
+		LEFT JOIN dic_info d ON p.prj_type = d.id
+		WHERE
+		(p.is_deleted = 0 OR p.is_deleted IS NULL)
+		AND
+		(
+		p.prj_type LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.prj_id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.year LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.plan_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.pre_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.actual_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.accm_plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.accm_actual_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s1_plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s2_plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s3_plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s4_plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s1_plan_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s2_plan_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s3_plan_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.s4_plan_content LIKE CONCAT('%',#{keyword},'%')
+		)
+	</select>
+	
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IChatGroupInfoMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.ChatGroupInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="prj_id" property="prjId" jdbcType="INTEGER" />
+    <result column="introduce" property="introduce" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+  </resultMap> -->
+  <sql id="Base_Column_List" >
+    cgi.id id, cgi.group_name groupName, cgi.type type, cgi.prj_id prjId, cgi.introduce introduce, 
+    cgi.enable_name_update enableNameUpdate, cgi.enable_remove enableRemove, cgi.create_at createAt, u.id createId, u.real_name createName
+  </sql>
+  
+  <sql id="Base_Table_List" >
+    chat_group_info cgi LEFT JOIN chat_group_user cgu1 ON cgi.id = cgu1.chat_group_id AND cgu1.role = 0
+  		LEFT JOIN org_user u ON cgu1.user_id = u.id
+  </sql>
+  
+  <select id="selectMyChatGroupInfo" resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupBaseOut">
+  	SELECT <include refid="Base_Column_List"/>
+  	FROM <include refid="Base_Table_List"/>
+  		LEFT JOIN chat_group_user cgu2 ON cgi.id = cgu2.chat_group_id
+  	WHERE
+  		cgu2.user_id = #{userId} AND cgi.type = 2
+  		<if test="nameLike != null">
+  			AND cgi.group_name LIKE "%"#{nameLike}"%"
+  		</if>
+  	ORDER BY cgi.create_at desc
+  </select>
+  
+  <select id="selectPrjChatGroupInfo" resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupBaseOut">
+  	SELECT <include refid="Base_Column_List"/>
+  	FROM <include refid="Base_Table_List"/>
+  		LEFT JOIN chat_group_user cgu2 ON cgi.id = cgu2.chat_group_id
+  	WHERE
+  		cgu2.user_id = #{userId} AND cgi.type = 1 AND cgi.prj_id = #{prjId} AND cgi.prj_type = #{prjType}
+  	GROUP BY cgi.id
+  	ORDER BY cgi.create_at desc, cgi.id desc
+  </select>
+  
+  <select id="selectPrjList" resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupPrjOut">
+  	SELECT distinct cgi.prj_id prjId, p.name prjName, cgi.prj_type prjType
+  	FROM <include refid="Base_Table_List"/>
+  		LEFT JOIN chat_group_user cgu2 ON cgi.id = cgu2.chat_group_id
+  		LEFT JOIN (SELECT full_name name, id, 21401 prj_type FROM prj_info
+  		UNION ALL SELECT name, id, 21403 prj_type FROM cb_plan_prj) p ON cgi.prj_id = p.id AND cgi.prj_type = p.prj_type
+  	WHERE
+  		cgu2.user_id = #{userId} AND cgi.type = 1 AND cgi.prj_id is not null
+  		<if test="prjType != null">
+  			AND cgi.prj_type = #{prjType}
+  		</if>
+  		<if test="nameLike != null">
+  			AND cgi.group_name LIKE "%"#{nameLike}"%"
+  		</if>
+  	ORDER BY cgi.create_at desc
+  </select>
+  
+  
+  <select id="selectFullChatGroupInfoById" parameterType="int"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupBaseOut">
+  	SELECT <include refid="Base_Column_List"/>, p.name prjName
+  	FROM <include refid="Base_Table_List"/>
+  		LEFT JOIN (SELECT full_name name, id, 21401 prj_type FROM prj_info
+  		UNION ALL SELECT name, id, 21403 prj_type FROM cb_plan_prj) p ON cgi.prj_id = p.id AND cgi.prj_type = p.prj_type
+  	WHERE cgi.id = #{id}
+  </select>
+  
+  <select id="selectSimpleChatGroupInfoById" parameterType="int"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupSimpleOut">
+  	SELECT cgi.id id, cgi.group_name groupName, cgi.enable_name_update enableNameUpdate, cgi.enable_remove enableRemove, count(cgu.id) groupNum
+  	FROM chat_group_info cgi LEFT JOIN chat_group_user cgu on cgi.id = cgu.chat_group_id
+  	WHERE cgi.id = #{id}
+  </select>
+  
+  <!-- <select id="selectSimpleChatGroupInfoByPrjId" 
+  		resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupSimpleOut">
+  	SELECT cgi.id id, cgi.group_name groupName, cgi.enable_name_update enableNameUpdate, cgi.enable_remove enableRemove, count(cgu.id) groupNum
+  	FROM chat_group_info cgi JOIN chat_group_user cgu on cgi.id = cgu.chat_group_id
+  	WHERE cgi.prj_id = #{prjId}
+  	AND cgi.id in (SELECT distinct chat_group_id FROM chat_group_user WHERE user_id = #{userId})
+  	HAVING count(cgu.id) <![CDATA[>]]> 0
+  </select> -->
+  
+  <select id="selectLeaderChatGroupInfo" resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupBaseOut">
+  	SELECT <include refid="Base_Column_List"/>
+  	FROM leader_group lg LEFT JOIN chat_group_info cgi ON lg.cg_id = cgi.id
+  		LEFT JOIN chat_group_user cgu1 ON cgi.id = cgu1.chat_group_id AND cgu1.role = 0
+  		LEFT JOIN org_user u ON cgu1.user_id = u.id
+  		LEFT JOIN chat_group_user cgu2 ON cgi.id = cgu2.chat_group_id
+  	WHERE
+  		cgu2.user_id = #{userId} AND cgi.type = 1
+  		<if test="nameLike != null">
+  			AND cgi.group_name LIKE "%"#{nameLike}"%"
+  		</if>
+  	ORDER BY cgi.create_at desc
+  </select>
+  
+	<select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.ChatGroupInfoRow">
+		SELECT c.*, IFNULL(c.is_deleted, 0) isDeleted, d.value_remark prjTypeTrans, p.full_name prjIdTrans
+		FROM chat_group_info c
+		LEFT JOIN dic_info d ON c.prj_type = d.id
+		LEFT JOIN prj_info p ON c.prj_id = p.id
+		WHERE c.is_deleted = 0 OR c.is_deleted IS NULL
+	</select>
+	
+	<select id="selectAllchatGroupInfoOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT group_name optText, id optValue
+		FROM chat_group_info
+		WHERE is_deleted = 0
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.ChatGroupInfoRow">
+		SELECT c.*, IFNULL(c.is_deleted, 0) isDeleted, d.value_remark prjTypeTrans, p.full_name prjIdTrans
+		FROM chat_group_info c
+		LEFT JOIN dic_info d ON c.prj_type = d.id
+		LEFT JOIN prj_info p ON c.prj_id = p.id
+		WHERE 
+		(
+		c.is_deleted = 0 OR c.is_deleted IS NULL
+		)
+		AND
+		(
+		c.id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		c.group_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		c.type LIKE CONCAT('%',#{keyword},'%')
+		OR
+		d.value_remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.full_name LIKE CONCAT('%',#{keyword},'%')
+		)
+	</select>
+	  
+</mapper>

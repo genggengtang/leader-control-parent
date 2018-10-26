@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjMonthPlanMapper" >
+  
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.vo.output.PrjMonthReportOut" >
+    <result column="year" property="year" jdbcType="INTEGER" />
+    <result column="month" property="month" jdbcType="TINYINT" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="actual_content_sub" property="actualContentSub" jdbcType="VARCHAR" />
+    <result column="actual_content" property="actualContent" jdbcType="VARCHAR" />
+    <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
+    <result column="issue_content" property="issueContent" jdbcType="VARCHAR" />
+    <result column="issue_content_sub" property="issueContentSub" jdbcType="VARCHAR" />
+    <result column="proposal" property="proposal" jdbcType="VARCHAR" />
+    <result column="proposal_sub" property="proposalSub" jdbcType="VARCHAR" />
+    <result column="actual_url" property="actualUrl" jdbcType="VARCHAR" />
+    
+    <result column="plan_invest" property="accmPlanInvest2Month" jdbcType="VARCHAR" />
+    <result column="actual_invest" property="accmActualInvest2Month" jdbcType="VARCHAR" />
+  </resultMap> -->
+  
+  <sql id="Base_Column_List" >
+    m.id monthId, m.month month, m.title title, m.actual_content actualContent, left(m.actual_content, 40) actualContentSub,
+  	m.pic_name picName, m.pic_url picUrl, m.issue_content issueContent, left(m.issue_content, 40) issueContentSub, m.proposal proposal,
+  	left(m.proposal, 40) proposalSub, m.plan_invest accmPlanInvest2Month, m.actual_invest accmActualInvest2Month
+  </sql>
+  
+  <select id="selectByPrjIdAndYear" resultType="org.zxs.leader.control.dao.model.vo.output.PrjMonthSimpleOut">
+  	SELECT m.month month, m.plan_invest accmPlanInvest2Month, m.actual_invest accmActualInvest2Month
+  	FROM prj_month_plan m LEFT JOIN prj_year_plan y ON m.year_id = y.id
+  	WHERE y.prj_id = #{prjId} AND y.prj_type = #{prjType}
+  		<if test="year != null">
+  			and y.year = #{year}
+  		</if>
+  	ORDER BY m.month
+  </select>
+  
+  <select id="selectByYearId" resultType="org.zxs.leader.control.dao.model.vo.output.PrjMonthReportOut">
+  	SELECT <include refid="Base_Column_List"/>, CONCAT(#{baseUrl}, "get-month-report/", m.id) actualUrl
+  	FROM prj_month_plan m 
+  	WHERE m.year_id = #{yearId} AND m.status = 1
+  	ORDER BY m.month desc
+  </select>
+  
+  <select id="selectSimpleByYearId" parameterType="int"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.PrjMonthSimpleOut">
+  	SELECT month, plan_invest accmPlanInvest2Month, actual_invest accmActualInvest2Month
+  	FROM prj_month_plan 
+  	WHERE year_id = #{yearId}
+  	ORDER BY month
+  </select>
+  
+  <select id="selectListInfo" parameterType="org.zxs.leader.control.dao.model.vo.query.MonthReportQuery"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.PrjMonthReportOut">
+  	SELECT <include refid="Base_Column_List"/>, y.year year
+  	FROM prj_month_plan m LEFT JOIN prj_year_plan y ON m.year_id = y.id
+  	<where>
+  		<if test="query.year != null">
+  			y.year = #{query.year}
+  		</if>
+  		<if test="query.month != null">
+  			AND m.month = #{query.month}
+  		</if>
+  		<if test="query.prjType != null">
+  			AND y.prj_type = #{query.prjType}
+  		</if>
+  		<if test="query.prjId != null">
+  			AND y.prj_id = #{query.prjId}
+  		</if>
+  		<if test="query.monthId != null">
+  			AND m.id = #{query.monthId}
+  		</if>
+  	</where>
+  	ORDER BY y.year, m.month
+  </select>
+  
+	<select id="selectPicNameList" resultType="org.zxs.leader.control.dao.model.PrjMonthPlan">
+		SELECT id, month, title, actual_content actualContent, pic_name picName, pic_url picUrl, actual_url actualUrl,
+		issue_content issueContent, proposal, plan_invest planInvest, actual_invest actualInvest
+		FROM prj_month_plan
+		WHERE pic_url != '' and pic_url is not null and actual_url != '' and actual_url is not null
+		ORDER BY id
+	</select>
+  
+	<select id="selectAllSoft" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjMonthPlanRow">
+		SELECT m.*, IFNULL(m.is_deleted, 0) isDeleted, y.year yearIdTrans
+		FROM prj_month_plan m
+		LEFT JOIN prj_year_plan y ON m.year_id = y.id
+		WHERE m.is_deleted = 0 OR m.is_deleted IS NULL
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjMonthPlanRow">
+		SELECT m.*, IFNULL(m.is_deleted, 0) isDeleted, y.year yearIdTrans
+		FROM prj_month_plan m
+		LEFT JOIN prj_year_plan y ON m.year_id = y.id
+		WHERE
+		(m.is_deleted = 0 OR m.is_deleted IS NULL)
+		AND
+		(
+		m.plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.plan_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.actual_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.title LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.actual_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.pic_url LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.pic_clear_url LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.pic_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.issue_content LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.proposal LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.actual_url LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.status LIKE CONCAT('%',#{keyword},'%')
+		OR
+		y.year LIKE CONCAT('%',#{keyword},'%')
+		)
+	</select>
+	
+	<select id="selectYearIdOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT y.year optText, m.year_id optValue
+		FROM prj_month_plan m
+		LEFT JOIN prj_year_plan y ON m.year_id = y.id
+		WHERE m.is_deleted = 0 OR m.is_deleted IS NULL
+	</select>
+
+</mapper>

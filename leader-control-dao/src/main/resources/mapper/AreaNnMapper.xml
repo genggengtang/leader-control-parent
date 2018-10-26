@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IAreaNnMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.AreaNn" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="TINYINT" />
+    <result column="nation_code" property="nationCode" jdbcType="VARCHAR" />
+  </resultMap> -->
+  <sql id="Base_Column_List" >
+    id, name, level, nation_code
+  </sql>
+  
+  <select id="selectAllWithoutProv" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+  	SELECT id optValue, name optText FROM area_nn
+  	WHERE level between 2 and 3
+  </select>
+  
+  <select id="selectAllAreaNameOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+  	SELECT id optValue, name optText
+  	FROM area_nn
+  </select>
+  
+</mapper>

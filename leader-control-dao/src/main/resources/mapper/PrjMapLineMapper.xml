@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjMapLineMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.PrjMapLine" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="prj_id" property="prjId" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap> -->
+  
+  <!-- <sql id="Base_Column_List" >
+    id, prj_id, remark
+  </sql> -->
+
+	<select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjMapLineRow">
+		SELECT m.*, d.value_remark prjTypeTrans, p.full_name prjIdTrans
+		FROM prj_map_line m
+		LEFT JOIN dic_info d ON m.prj_type = d.id
+		LEFT JOIN prj_info p ON m.prj_id = p.id
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjMapLineRow">
+		SELECT m.*, d.value_remark prjTypeTrans, p.full_name prjIdTrans
+		FROM prj_map_line m
+		LEFT JOIN dic_info d ON m.prj_type = d.id
+		LEFT JOIN prj_info p ON m.prj_id = p.id
+		WHERE
+		m.id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		m.remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		d.value_remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.full_name LIKE CONCAT('%',#{keyword},'%')
+	</select>
+	
+	<select id="selectOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT remark optText, id optValue FROM prj_map_line
+	</select>	
+
+</mapper>

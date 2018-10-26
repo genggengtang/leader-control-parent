@@ -1,0 +1,375 @@
+{
+	"contentManagement": [
+		{
+			"title": "用户机构",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "机构",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "org_unit",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "机构用户",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "org_user",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				}
+			]
+		},
+		{
+			"title": "项目管理",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "年计划",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_year_plan",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": false,
+					"soft": true
+				},
+				{
+					"title": "月计划",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_month_plan",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": false,
+					"soft": true
+				},
+				{
+					"title": "附件",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_attachment",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "协调事项",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_issue",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "审批文件",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_prove",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "地图线",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_map_line",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "地图线点",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_point",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				}
+			]
+		},
+		{
+			"title": "市领导联系",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "基本信息 - 市领导联系",
+					"icon": "&#xe61c;",
+					"href": "../../page/pageLeaderControlProject/projectList.html",
+					"spread": false,
+					"rows":""
+				},
+				{
+					"title": "服务队表",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "leader_group",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "关联机构用户",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "prj_contact",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				}
+			]
+		},
+		{
+			"title": "城建计划",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "基本信息 - 城建计划",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "city_build_prj",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "期计划信息",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "cb_plan_prj",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "资金信息",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "cb_invest_source",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "关联机构",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "cp_prj_org",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				}
+			]
+		},
+		{
+			"title": "市统筹",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "基本信息 - 市统筹",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "city_plan_prj",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "关联机构",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "cp_prj_org",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				}
+			]
+		},
+		{
+			"title": "聊天",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "群组",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "chat_group_info",
+					"create": false,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "群成员",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "chat_group_user",
+					"create": false,
+					"update": true,
+					"down": false,
+					"impr": true,
+					"soft": false
+				}
+			]
+		},
+		{
+			"title": "随手拍",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "主题",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "topic_pic",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "评论",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "topic_comment",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				}
+			]
+		},
+		{
+			"title": "其他",
+			"icon": "icon-text",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "用户意见",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "user_issue",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": true
+				},
+				{
+					"title": "会议纪要",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "meeting_note",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "工作资讯",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "work_info",
+					"create": true,
+					"update": true,
+					"down": true,
+					"impr": true,
+					"soft": false
+				},
+				{
+					"title": "文件管理",
+					"icon": "icon-text",
+					"href": "../../page/commonTable/commonTable.html",
+					"spread": false,
+					"table": "files_management",
+					"create": false,
+					"update": false,
+					"down": false,
+					"impr": false,
+					"soft": false
+				}
+			]
+		}
+	]
+}

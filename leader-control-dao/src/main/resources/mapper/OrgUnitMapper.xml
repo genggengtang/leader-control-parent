@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IOrgUnitMapper">
+	
+	<select id="selectAllRows" resultType="org.zxs.leader.control.dao.model.vo.output.rows.OrgUnitRow">
+		SELECT o.*, IFNULL(o.is_deleted, 0) isDeleted, d.value_remark typeTrans, n.name areaIdTrans
+		FROM org_unit o 
+		LEFT JOIN area_nn n ON o.area_id = n.id 
+		LEFT JOIN dic_info d ON o.type = d.id
+		WHERE
+		o.is_deleted = 0 OR o.is_deleted IS NULL
+	</select>
+	
+	<select id="selectRowsByKeyword" resultType="org.zxs.leader.control.dao.model.vo.output.rows.OrgUnitRow">
+		SELECT o.*, IFNULL(o.is_deleted, 0) isDeleted, d.value_remark typeTrans, n.name areaIdTrans
+		FROM org_unit o 
+		LEFT JOIN area_nn n ON o.area_id = n.id 
+		LEFT JOIN dic_info d ON o.type = d.id
+		WHERE
+		(o.is_deleted = 0 OR o.is_deleted IS NULL)
+		AND (
+		o.full_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.short_name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.type LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.area_id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		d.value_remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		n.name LIKE CONCAT('%',#{keyword},'%')
+		)
+	</select>
+	
+	<select id="getAllOrgIdOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT full_name optText, id optValue FROM org_unit;
+	</select>
+
+</mapper>

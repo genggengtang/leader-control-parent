@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ICbInvestSourceMapper" >
+  
+  <!-- <sql id="Base_Column_List" >
+    id, prj_plan_id, source_no, source_type_no, plan_invest, actual_invest, create_at, 
+    update_at
+  </sql> -->
+  
+	<select id="selectInvestSourceByPrjId" resultType="org.zxs.leader.control.dao.model.vo.output.InvestSourceOut">
+		SELECT s.plan_invest planInvest, if(s.plan_invest is not null, ifnull(s.actual_invest, 0), null) actualInvest, d1.value_remark sourceName,  d2.value_remark sourceTypeName,
+			if(s.plan_invest is not null, s.plan_invest - ifnull(s.actual_invest, 0), null) restInvest
+		FROM cb_invest_source s LEFT JOIN dic_info d1 ON s.source_no = d1.id
+			LEFT JOIN dic_info d2 ON s.source_type_no = d2.id
+		WHERE s.prj_plan_id = #{prjId}
+		ORDER BY s.id
+	</select>
+	
+	<select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CbInvestSourceRow">
+		SELECT o.*, p.name prjPlanIdTrans, d1.value_remark sourceNoTrans, d2.value_remark sourceTypeNoTrans
+		FROM cb_invest_source o
+		LEFT JOIN dic_info d1 ON o.source_no = d1.id
+		LEFT JOIN dic_info d2 ON o.source_type_no = d2.id
+		LEFT JOIN cb_plan_prj p ON o.prj_plan_id = p.id
+	</select>
+	
+	<select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CbInvestSourceRow">
+		SELECT o.*, p.name prjPlanIdTrans, d1.value_remark sourceNoTrans, d2.value_remark sourceTypeNoTrans
+		FROM cb_invest_source o
+		LEFT JOIN dic_info d1 ON o.source_no = d1.id
+		LEFT JOIN dic_info d2 ON o.source_type_no = d2.id
+		LEFT JOIN cb_plan_prj p ON o.prj_plan_id = p.id
+		WHERE
+		o.id LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.plan_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		o.actual_invest LIKE CONCAT('%',#{keyword},'%')
+		OR
+		p.name LIKE CONCAT('%',#{keyword},'%')
+		OR
+		d1.value_remark LIKE CONCAT('%',#{keyword},'%')
+		OR
+		d2.value_remark LIKE CONCAT('%',#{keyword},'%')
+	</select>
+
+</mapper>

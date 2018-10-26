@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IMeetingNoteMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.MeetingNote" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+  </resultMap> -->
+  
+  <sql id="Base_Column_List" >
+    id, prj_type, type, title, name, url, create_at
+  </sql>
+  
+  <select id="selectMyMeetingNote" parameterType="org.zxs.leader.control.dao.model.vo.query.MeetingNoteQuery"
+  	resultType="org.zxs.leader.control.dao.model.vo.output.MyMeetingNoteOut">
+  	SELECT n.id id, n.prj_type prjType,n.type type, n.title title, n.name name, n.url url, n.create_at createAt, f.id favoriteId
+  	FROM meeting_note n LEFT JOIN favorite_note f ON n.id = f.note_id AND f.user_id = #{query.userId}
+  	<where>
+  		<if test="query.type != null">
+	  		find_in_set(n.type, #{query.type})
+	  	</if>
+	  	<if test="query.prjType != null">
+	  		and n.prj_type = #{query.prjType}
+	  	</if>
+	  	<if test="query.isFavorite != null">
+	  		and f.id is not null
+	  	</if>
+	  	<if test="query.isFavorite == null">
+	  		<if test="query.isInspectIn == 0">
+		  		and n.type != 20904
+		  	</if>
+		  	<if test="query.isInspectIn == 1">
+		  		and n.type = 20904
+		  	</if>
+	  	</if>
+	  	<if test="query.keyword != null">
+	  		and (n.name like "%"#{query.keyword}"%" or n.title like "%"#{query.keyword}"%")
+	  	</if>
+	  	<if test="query.startAt != null">
+	  		and n.create_at >= #{query.startAt}
+	  	</if>
+	  	<if test="query.endAt != null">
+	  		and n.create_at <![CDATA[<=]]> #{query.endAt}
+	  	</if>
+	  	
+  	</where> 
+	  	
+	<choose>
+       <when test="query.orderBy != null and query.orderBy != ''">
+           ORDER BY #{query.orderBy}
+       </when>
+       <otherwise>
+           ORDER BY n.create_at desc
+       </otherwise>
+   </choose>
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.MeetingNoteRow">
+  	SELECT m.*, d1.value_remark prjTypeTrans, d2.value_remark typeTrans
+  	FROM meeting_note m
+  	LEFT JOIN dic_info d1 ON m.prj_type = d1.id
+  	LEFT JOIN dic_info d2 ON m.type = d2.id
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.MeetingNoteRow">
+  	SELECT m.*, d1.value_remark prjTypeTrans, d2.value_remark typeTrans
+  	FROM meeting_note m
+  	LEFT JOIN dic_info d1 ON m.prj_type = d1.id
+  	LEFT JOIN dic_info d2 ON m.type = d2.id
+  	WHERE
+  	m.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	m.title LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	m.name LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	m.url LIKE CONCAT('%',#{keyword},'%')
+	OR
+  	m.create_at LIKE BINARY CONCAT('%',#{keyword},'%')
+	OR
+	d1.value_remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d2.value_remark LIKE CONCAT('%',#{keyword},'%')
+  </select>
+  
+	<select id="selectAllMeetingNoteOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT title optText, id optValue
+		FROM meeting_note
+	</select>
+	
+</mapper>

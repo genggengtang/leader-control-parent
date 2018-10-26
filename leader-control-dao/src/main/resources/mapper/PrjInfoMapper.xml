@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjInfoMapper" >
+  
+  <!-- <resultMap id="PrjListMap" type="org.zxs.leader.control.dao.model.vo.output.PrjListInfoOut" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="full_name" property="fullName" jdbcType="VARCHAR" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
+    <result column="lng" property="lng" jdbcType="DECIMAL" />
+    <result column="lat" property="lat" jdbcType="DECIMAL" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="plan_start_dt" property="planStartDt" jdbcType="DATE" />
+    <result column="plan_end_dt" property="planEndDt" jdbcType="DATE" />
+    <result column="is_60th_welfare" property="is60thWelfare" jdbcType="TINYINT" />
+    <result column="is_prvc_plan" property="isPrvcPlan" jdbcType="TINYINT" />
+    
+    <result column="plan_status_dis" property="planStatusDis" jdbcType="VARCHAR" />
+    <result column="actual_status_dis" property="actualStatusDis" jdbcType="VARCHAR" />
+    <result column="accm_plan_invest" property="accmPlanInvest" jdbcType="INTEGER" />
+    <result column="accm_actual_invest" property="accmActualInvest" jdbcType="INTEGER" />
+    <result column="yeal_plan_invest" property="yearPlanInvest" jdbcType="INTEGER" />
+    <result column="month_rate" property="completeRateByMonth" jdbcType="INTEGER" />
+    <result column="year_rate" property="completeRateByYear" jdbcType="INTEGER" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="owner_org_name" property="ownerName" jdbcType="VARCHAR" />
+    <result column="owner_org_name_sub" property="ownerNameSub" jdbcType="VARCHAR" />
+    <result column="complete_status" property="completeStatusDis" jdbcType="VARCHAR" />
+    <result column="build_status" property="buildStatus" jdbcType="INTEGER" />
+  </resultMap> -->
+  
+  <resultMap id="SearchResultMap" type="org.zxs.leader.control.dao.model.vo.output.PrcSearchOut" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="full_name" property="value" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="type_dis" property="typeDis" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="simple_detail_List">
+  		i.id id, i.full_name fullName, i.short_name shortName, i.lng lng, i.lat lat, i.type type, i.is_60th_welfare is60thWelfare, i.is_prvc_plan isPrvcPlan,
+	  	i.total_invest totalPlanInvest, i.actual_invest totalActualInvest, i.content content, i.remark remark, i.remark_display remarkDisplay, g.name groupName,
+	  	d1.value_remark planStatusDis,d2.value_remark actualStatusDis, d3.value_remark industryName,
+	  	y.plan_invest yearPlanInvest, y.plan_content yearContent,
+	  	u1.real_name rspLeaderName, u2.real_name contactLeaderName,
+	  	u3.real_name contactName, if(i.contact_id != #{query.userId} and u3.level >= #{query.level}, u3.mobile_phone, "") contactPhone, u3.level contactLevel,
+	  	o.full_name contactOrgName, GROUP_CONCAT(distinct a.name) areaName
+  </sql>
+  
+  <sql id="simple_detail_table">
+  		prj_info i
+	  	LEFT JOIN org_user u1 ON i.rsp_leader_id = u1.id
+	  	LEFT JOIN org_user u2 ON i.contact_leader_id = u2.id
+	  	LEFT JOIN org_user u3 ON i.contact_id = u3.id
+	  	LEFT JOIN org_unit o ON u3.org_id = o.id
+	  	LEFT JOIN area_nn a ON find_in_set(a.id, i.area_id)
+	  	LEFT JOIN prj_contact c ON i.id = c.prj_id and c.type = 20805
+	  	LEFT JOIN leader_group g ON i.rsp_leader_id = g.user_id
+	  	LEFT JOIN dic_info d1 ON i.plan_status = d1.id
+		LEFT JOIN dic_info d2 ON i.actual_status = d2.id
+		LEFT JOIN dic_info d3 ON i.industry = d3.id
+  </sql>
+  
+  <sql id="prj_view_List">
+  		id, fullName, lng, lat, rspLeaderId, rspLeaderName, type, content, totalInvest, actualInvest, industry, industryDis,
+  		planStatus, planStatusDis, actualStatus, actualStatusDis, planStartDt, actualStartDt, planEndDt, actualEndDt,
+  		areaId, areaName, is60thWelfare, isPrvcPlan, latestYearId, shortName, remark, remarkDisplay, createAt, updateAt, isDeleted
+  </sql>
+  
+  <sql id="prj_info_table_fields">
+	`id`, `latest_year_id`, `full_name`, `short_name`, `lng`, `lat`, `rsp_leader_id`, `contact_leader_id`, `contact_id`,
+	`type`, `content`, `total_invest`, `actual_invest`, `submit_org_id`, `industry`, `plan_status`, `actual_status`,
+	`area_id`, `plan_start_dt`, `actual_start_dt`, `plan_end_dt`, `actual_end_dt`, `is_60th_welfare`, `is_prvc_plan`,
+	`owner_org_name`, `remark`, `remark_display`, `create_at`, `update_at`
+  </sql>
+  
+  <sql id="prj_info_model_properties">
+	#{id}, #{latestYearId}, #{fullName}, #{shortName}, #{lng}, #{lat}, #{rspLeaderId}, #{contactLeaderId},
+	#{contactId}, #{type}, #{content}, #{totalInvest}, #{actualInvest}, #{submitOrgId}, #{industry}, #{planStatus},
+	#{actualStatus}, #{areaId}, #{planStartDt}, #{planEndDt}, #{actualStartDt}, #{actualEndDt}, #{is60thWelfare},
+	#{isPrvcPlan}, #{ownerOrgName}, #{remark}, #{remarkDisplay}, #{createAt}, #{updateAt}
+  </sql>
+  
+  <select id="selectAllInfo" parameterType="org.zxs.leader.control.dao.model.vo.query.PrjPageQuery" resultType="org.zxs.leader.control.dao.model.vo.output.PrjListInfoOut">
+  	SELECT i.id id, i.full_name fullName, i.short_name shortName, i.lng lng, i.lat lat, i.type type, i.plan_start_dt planStartDt, i.plan_end_dt planEndDt, i.total_invest totalPlanInvest,
+  		i.is_60th_welfare is60thWelfare, i.is_prvc_plan isPrvcPlan, i.owner_org_name ownerName, left(i.owner_org_name,12) ownerNameSub, i.create_at createAt, if(i.actual_end_dt is null, null, '已竣工') actualCompletionStatus, 
+	  	y.accm_plan_invest accmPlanInvest, y.accm_actual_invest accmActualInvest, y.plan_invest yearPlanInvest, y.month_rate completeRateByMonth, y.year_rate completeRateByYear,
+	  	CASE
+		  	WHEN y.month_rate is null THEN '其他' 
+		  	WHEN y.month_rate <![CDATA[>]]> 105 THEN '超前'
+		  	WHEN y.month_rate between 95 and 105 THEN '正常'
+		  	WHEN y.month_rate <![CDATA[<]]> 95 THEN '滞后'
+		END completeStatusDis,
+	  	d1.value_remark planStatusDis, d2.value_remark actualStatusDis, g.name groupName
+	  	<if test="record.month != null">
+	  		, CASE
+	  			WHEN date_format(#{record.month}, '%Y-%m') = date_format(i.actual_start_dt, '%Y-%m') THEN 1
+	  			ELSE 2
+	  		END as buildStatus
+	  	</if>
+  	FROM prj_info i LEFT JOIN 
+			(SELECT id, plan_invest, accm_plan_invest, accm_actual_invest,
+  			if(accm_plan_invest=0, null, accm_actual_invest * 100 DIV accm_plan_invest) month_rate,
+		  	if(plan_invest=0, null, accm_actual_invest * 100 DIV plan_invest) year_rate
+ 			FROM prj_year_plan WHERE prj_type = 21401) y ON i.latest_year_id = y.id
+	  	LEFT JOIN leader_group g ON i.rsp_leader_id = g.user_id
+	  	LEFT JOIN dic_info d1 ON i.plan_status = d1.id
+		LEFT JOIN dic_info d2 ON i.actual_status = d2.id
+		LEFT JOIN prj_contact c ON i.id = c.prj_id and c.type = 20805
+  	<where>
+  		<if test="record.prjId != null" >
+  			i.id = #{record.prjId}
+  		</if>
+  		<if test="record.prjName != null" >
+  			and i.full_name = #{record.prjName}
+  		</if>
+  		<if test="record.leaderId != null and record.isSelf == 1">
+  			<!-- and (i.rsp_leader_id = #{record.leaderId} or i.contact_leader_id = #{record.leaderId}) -->
+  			and i.id in (SELECT distinct prj_id from prj_contact where user_id = #{record.leaderId})
+  		</if>
+  		<!-- <if test="record.leaderId != null and record.isSelf == 0">
+  			and i.rsp_leader_id != #{record.leaderId}
+  		</if> -->
+  		<if test="record.rspLeaderId != null">
+  			and i.rsp_leader_id = #{record.rspLeaderId}
+  		</if>
+  		<if test="record.is60thWelfare == 1">
+  			and i.is_60th_welfare = #{record.is60thWelfare}
+  		</if>
+  		<if test="record.isPrvcPlan == 1">
+  			and i.is_prvc_plan = #{record.isPrvcPlan}
+  		</if>
+  		<if test="record.group != null">
+  			and g.id = #{record.group}
+  		</if>
+  		<if test="record.areaId != null">
+  			and find_in_set(#{record.areaId}, i.area_id)
+  		</if>
+  		<if test="record.planStatus != null">
+  			and i.plan_status = #{record.planStatus}
+  		</if>
+  		<if test="record.industry != null">
+  			and i.industry = #{record.industry}
+  		</if>
+  		<if test="record.leaderId != null and record.isFavorite == 1">
+  			and i.id in (SELECT distinct prj_id FROM favorite_prj WHERE user_id = #{record.leaderId} AND prj_type = 21401)
+  		</if>
+  		
+  		<if test="record.orgId != null">
+  			and c.user_id in (
+  					SELECT distinct id FROM org_user WHERE org_id = #{record.orgId}
+  				)
+  		</if>
+  		<if test="record.completeStatus == 1">
+  			and y.month_rate <![CDATA[>]]> 105
+  		</if>
+  		<if test="record.completeStatus == 2">
+  			and y.month_rate BETWEEN 95 AND 105
+  		</if>
+  		<if test="record.completeStatus == 3">
+  			and y.month_rate <![CDATA[<]]> 95
+  		</if>
+  		<if test="record.completeStatus == 4">
+  			and y.month_rate is null
+  		</if>
+  		<if test="record.isLngAndLatNotNull == 1">
+  			and i.lng is not null
+  			and i.lat is not null
+  		</if>
+  		<if test="record.isAreaCross == 1">
+  			and locate(',', i.area_id)
+  		</if>
+  		<if test="record.keyword != null">
+  			and i.id in (
+  				SELECT distinct t.id
+				FROM (SELECT p1.id id, p1.full_name keyword FROM prj_info p1
+					UNION ALL
+					SELECT p2.id id, u1.real_name keyword FROM org_user u1 left join prj_info p2 on u1.id = p2.rsp_leader_id
+					UNION ALL
+					SELECT c.prj_id id, o.full_name keyword FROM org_unit o left join org_user u2 on o.id = u2.org_id left join prj_contact c on u2.id = c.user_id) t
+				WHERE t.keyword like "%"#{record.keyword}"%"
+  			)
+  		</if>
+  		<if test="record.leaderId != null and record.userLevel == 6">
+  			<!-- and c.user_id = #{record.leaderId} -->
+  			and i.id in (
+  				SELECT distinct c.prj_id from prj_contact c 
+					left join (select id, org_id, org_id orgId from org_user
+						UNION ALL select u.id, u.org_id, r.son_org_id orgId
+						from org_user u left join org_relation r on u.org_id = r.mth_org_id where r.id is not null
+						) u on c.org_id = u.orgId or c.user_id = u.id 
+					where u.id = #{record.leaderId} and c.type in (20805,20806)
+				) 
+  		</if>
+  		<if test="record.prjUser != null">
+  			and i.id in (
+  				SELECT distinct prj_id from prj_contact where user_id = #{record.prjUser}
+			) 
+  		</if>
+  		<if test="record.nameLike != null">
+  			and i.full_name like "%"#{record.nameLike}"%"
+  		</if>
+  		<if test="record.ownerLike != null">
+  			and i.id in (
+  				SELECT distinct c.prj_id FROM org_unit o left join org_user u on o.id = u.org_id
+  				left join prj_contact c on u.id = c.user_id
+				WHERE o.full_name like "%"#{record.ownerLike}"%"
+  			)
+  		</if>
+  		<if test="record.month != null">
+  			and i.actual_start_dt is not null
+  			and date_format(#{record.month}, '%Y-%m') >= date_format(i.actual_start_dt, '%Y-%m')
+  			and (i.actual_end_dt is null or date_format(#{record.month}, '%Y-%m') <![CDATA[<=]]> date_format(i.actual_end_dt,'%Y-%m'))
+  		</if>
+  	</where>
+  	GROUP BY i.id
+  	<choose>
+  		<when test="record.orderBy != null and record.orderBy != ''">
+  			ORDER BY ${record.orderBy}
+  		</when>
+  		<otherwise>
+  			ORDER BY i.create_at, i.id
+  		</otherwise>
+  	</choose>
+  </select>
+  
+  <select id="selectBaseInfoById" parameterType="org.zxs.leader.control.dao.model.vo.query.PrjDetailQuery"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.PrjSimpleDetailOut">
+  	SELECT <include refid="simple_detail_List"/>
+  	FROM <include refid="simple_detail_table"/>
+  		LEFT JOIN prj_year_plan y ON i.latest_year_id = y.id
+  	WHERE i.id = #{query.id}
+  </select>
+  
+  <select id="selectFullInfoById" parameterType="org.zxs.leader.control.dao.model.vo.query.PrjDetailQuery"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.PrjFullDetailOut">
+  	SELECT <include refid="simple_detail_List"/>, if(i.actual_end_dt is null, null, '已竣工') actualCompletionStatus, 
+	  	y.accm_plan_invest accmPlanInvest, y.accm_actual_invest accmActualInvest, y.plan_invest yealPlanInvest, GROUP_CONCAT(distinct y1.year) years,
+		if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) completeRateByMonth,
+		if(y.plan_invest=0, null, y.accm_actual_invest * 100 DIV y.plan_invest) completeRateByYear, 
+		CASE
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) is null THEN '其他' 
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) <![CDATA[>]]> 105 THEN '超前'
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) between 95 and 105 THEN '正常'
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) <![CDATA[<]]> 95 THEN '滞后'
+		END completeStatusDis,
+		<if test="query.season == 1">
+			'一' seasonChar, y.s1_plan_invest seasonPlanInvest, y.s1_plan_content seasonPlanContent,
+			left(y.s1_plan_content, 40) seasonPlanContentSub
+		</if>
+		<if test="query.season == 2">
+			'二' seasonChar, y.s2_plan_invest seasonPlanInvest, y.s2_plan_content seasonPlanContent,
+			left(y.s2_plan_content, 40) seasonPlanContentSub
+		</if>
+		<if test="query.season == 3">
+			'三' seasonChar, y.s3_plan_invest seasonPlanInvest, y.s3_plan_content seasonPlanContent,
+			left(y.s3_plan_content, 40) seasonPlanContentSub
+		</if>
+		<if test="query.season == 4">
+			'四' seasonChar, y.s4_plan_invest seasonPlanInvest, y.s4_plan_content seasonPlanContent,
+			left(y.s4_plan_content, 40) seasonPlanContentSub
+		</if>
+  	FROM <include refid="simple_detail_table"/>
+  		LEFT JOIN prj_year_plan y1 ON i.id = y1.prj_id and y1.prj_type = 21401
+  		<choose>
+  			<when test="query.year != null">
+  				LEFT JOIN prj_year_plan y ON i.id = y.prj_id AND y.year = #{query.year} and y.prj_type = 21401
+  			</when>
+  			<otherwise>
+  				LEFT JOIN prj_year_plan y ON i.latest_year_id = y.id
+  			</otherwise>
+  		</choose>
+  	WHERE i.id = #{query.id}
+  </select>
+  
+  <select id="selectByNameLike" parameterType="string" resultMap="SearchResultMap">
+  	SELECT id, full_name, 1 as type, '按项目名' as type_dis
+  	FROM prj_info
+  	WHERE full_name like "%"#{nameLike}"%"
+  	ORDER BY id;
+  </select>
+  
+  <select id="selectStaticsBySelf" resultType="org.zxs.leader.control.dao.model.vo.output.PrjStaticsOut">
+		SELECT v.userId leaderId, v.realName leaderName, v.planInvest annualPlanInvest, v.actualInvest annualActualInvest, 
+	  		v.yearRate annualRate, v.startRate, v.endRate, v.totalNum,
+	  		COUNT(if(r.monthRate <![CDATA[>]]> 105, true, null)) aheadNum,
+	  		COUNT(if(r.monthRate <![CDATA[<]]> 95, true, null)) delayNum,
+	  		COUNT(if(r.monthRate between 95 and 105, true, null)) normalNum, 
+	  		COUNT(if(r.monthRate is null, true, null)) otherNum
+		FROM ld_prj_statics_view v LEFT JOIN (
+			SELECT c.user_id userId, py.prj_id, 
+			if(py.accm_plan_invest = 0, null, py.accm_actual_invest * 100 DIV py.accm_plan_invest) monthRate
+	  		FROM prj_contact c left join prj_info pi on c.prj_id = pi.id and c.type <![CDATA[<]]> 20807
+			LEFT JOIN prj_year_plan py ON pi.id = py.prj_id AND py.year = DATE_FORMAT(NOW(), '%Y') AND py.prj_type = 21401
+			GROUP BY c.user_id, py.prj_id
+			) r on v.userId = r.userId
+		<where>
+			<if test="leaderId != null">
+			 	v.userId = #{leaderId}
+			</if>
+		 </where>
+		ORDER BY v.level,v.orderBy
+  </select>
+
+	<select id="selectGroupStaticsByLeaderId" resultType="org.zxs.leader.control.dao.model.vo.output.PrjStaticsOut">
+		SELECT p.rspLeaderId leaderId, p.realName leaderName, p.planInvest annualPlanInvest, p.actualInvest annualActualInvest, 
+	  		p.yearRate annualRate, p.startRate, p.endRate, p.totalNum,
+	  		COUNT(if(r.month_rate <![CDATA[>]]> 105, true, null)) aheadNum,
+	  		COUNT(if(r.month_rate <![CDATA[<]]> 95, true, null)) delayNum,
+	  		COUNT(if(r.month_rate between 95 and 105, true, null)) normalNum, 
+	  		COUNT(if(r.month_rate is null, true, null)) otherNum
+		FROM ldgr_prj_statics_view p LEFT JOIN 
+			(SELECT pi.rsp_leader_id, py.prj_id, 
+				if(py.accm_plan_invest = 0, null, py.accm_actual_invest * 100 DIV py.accm_plan_invest) month_rate
+		  	FROM prj_info pi LEFT JOIN prj_year_plan py ON pi.id = py.prj_id AND py.year = DATE_FORMAT(NOW(), '%Y') AND py.prj_type = 21401
+				) r on p.rspLeaderId = r.rsp_leader_id
+		<where>
+		 	<if test="leaderExclude != null">
+		 		p.rspLeaderId != #{leaderExclude}
+		 	</if>
+		</where>
+		GROUP BY p.rspLeaderId
+		ORDER BY p.level, p.orderBy
+  </select>
+  
+  <select id="selectStaticsByFavorite" resultType="org.zxs.leader.control.dao.model.vo.output.PrjStaticsOut">
+  	SELECT u.id leaderId, u.real_name leaderName, p.plan_invest annualPlanInvest, p.actual_invest annualActualInvest, 
+  		p.year_rate annualRate, p.startRate startRate, p.endRate endRate, p.totalNum totalNum,
+  		COUNT(if(r.month_rate <![CDATA[>]]> 105, true, null)) aheadNum,
+  		COUNT(if(r.month_rate <![CDATA[<]]> 95, true, null)) delayNum,
+  		COUNT(if(r.month_rate between 95 and 105, true, null)) normalNum, 
+  		COUNT(if(r.month_rate is null, true, null)) otherNum
+	FROM (SELECT f.user_id, SUM(y.plan_invest) plan_invest, SUM(y.accm_actual_invest) actual_invest,
+			SUM(if(i.actual_start_dt is null, 0, 1)) * 100 DIV COUNT(if(i.plan_status = 20402,1,0)) startRate, 
+			SUM(if(i.actual_end_dt is null, 0, 1)) * 100 DIV COUNT(if(i.plan_status = 20404,1,0)) endRate,
+			if(SUM(y.plan_invest) = 0, null, SUM(y.accm_actual_invest) * 100 DIV SUM(y.plan_invest)) as year_rate,
+			COUNT(f.prj_id) totalNum
+	  	FROM favorite_prj f LEFT JOIN prj_info i ON f.prj_id = i.id and f.user_id = #{leaderId}
+	  	LEFT JOIN prj_year_plan y ON i.id = y.prj_id AND y.year = DATE_FORMAT(NOW(), '%Y') AND y.prj_type = 21401
+	  	WHERE f.prj_type = 21401 GROUP BY f.user_id) p
+  	LEFT JOIN (SELECT f.user_id, py.prj_id, 
+			if(py.accm_plan_invest = 0, null, py.accm_actual_invest * 100 DIV py.accm_plan_invest) as month_rate
+	  	FROM favorite_prj f LEFT JOIN prj_info pi ON f.prj_id = pi.id and f.user_id = #{leaderId}	
+			LEFT JOIN prj_year_plan py ON pi.latest_year_id = py.id
+		WHERE f.prj_type = 21401) r on p.user_id = r.user_id
+	LEFT JOIN org_user u ON p.user_id = u.id
+	WHERE p.user_id = #{leaderId} 
+	GROUP BY p.user_id
+  </select>
+  
+  <select id="selectByPrjCount" parameterType="org.zxs.leader.control.dao.model.vo.query.PrjCountQuery" resultType="int">
+  	SELECT count(i.id)
+  	FROM prj_info i
+  	<if test="query.groupId != null">
+  		LEFT JOIN leader_group g on i.rsp_leader_id = g.user_id
+  	</if>
+  	<where>
+  		<if test="query.groupId != null">
+  			g.id = #{query.groupId}
+  		</if>
+  		<if test="query.is60thWelfare == 1">
+  			and i.is_60th_welfare = #{query.is60thWelfare}
+  		</if>
+  		<if test="query.isPrvcPlan == 1">
+  			and i.is_prvc_plan = #{query.isPrvcPlan}
+  		</if>
+  	</where>
+  </select>
+  
+  <select id="selectTotalStatics" resultType="org.zxs.leader.control.dao.model.vo.output.PrjStaticsOut">
+  	SELECT SUM(y.plan_invest) annualPlanInvest, SUM(y.accm_actual_invest) annualActualInvest, COUNT(i.id) totalNum,
+	  		if(SUM(y.plan_invest) = 0, null, SUM(y.accm_actual_invest) * 100 DIV SUM(y.plan_invest)) annualRate, 
+	  		SUM(if(i.actual_start_dt is null, 0, 1)) * 100 DIV COUNT(if(i.plan_status = 20402,1,0)) startRate, 
+	  		SUM(if(i.actual_end_dt is null, 0, 1)) * 100 DIV COUNT(if(i.plan_status = 20404,1,0)) endRate, 
+	  		COUNT(if(r.month_rate <![CDATA[>]]> 105, true, null)) aheadNum,
+	  		COUNT(if(r.month_rate <![CDATA[<]]> 95, true, null)) delayNum,
+	  		COUNT(if(r.month_rate between 95 and 105, true, null)) normalNum, 
+	  		COUNT(if(r.month_rate is null, true, null)) otherNum
+	FROM prj_info i LEFT JOIN prj_year_plan y ON i.latest_year_id = y.id
+		LEFT JOIN (SELECT py.prj_id, if(py.accm_plan_invest = 0, null, py.accm_actual_invest * 100 DIV py.accm_plan_invest) as month_rate
+		  	FROM prj_year_plan py 
+		  	WHERE py.year = DATE_FORMAT(NOW(), '%Y') AND py.prj_type = 21401) r on i.id = r.prj_id
+  </select>
+  
+  <select id="selectMapInfoById" parameterType="int" resultType="org.zxs.leader.control.dao.model.vo.output.PrjMapOut">
+  	SELECT  d.value_remark planStatusDis,
+		CASE
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) is null THEN '其他' 
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) <![CDATA[>]]> 105 THEN '超前'
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) between 95 and 105 THEN '正常'
+		  	WHEN if(y.accm_plan_invest=0, null, y.accm_actual_invest * 100 DIV y.accm_plan_invest) <![CDATA[<]]> 95 THEN '滞后'
+		END completeStatusDis
+	FROM prj_info i LEFT JOIN prj_year_plan y ON i.latest_year_id = y.id
+		LEFT JOIN dic_info d ON i.plan_status = d.id
+  	WHERE i.id = #{id}
+  </select>
+  
+  <select id="selectPrjView" parameterType="org.zxs.leader.control.dao.model.vo.query.PrjViewQuery"
+  		resultType="org.zxs.leader.control.dao.model.LdPrjView">
+  	SELECT  <include refid="prj_view_List"/>
+	FROM ld_prj_view
+  	<where>
+  		<if test="query.prjId != null" >
+  			id = #{query.prjId}
+  		</if>
+  		<if test="query.rspLeaderId != null">
+  			and rspLeaderId = #{query.rspLeaderId}
+  		</if>
+  		<if test="query.is60thWelfare == 1">
+  			and is60thWelfare = #{query.is60thWelfare}
+  		</if>
+  		<if test="query.isPrvcPlan == 1">
+  			and isPrvcPlan = #{query.isPrvcPlan}
+  		</if>
+  		<if test="query.planStatus != null">
+  			and planStatus = #{query.planStatus}
+  		</if>
+  		<if test="query.industry != null">
+  			and industry = #{query.industry}
+  		</if>
+  		<if test="query.nameLike != null">
+  			and fullName like "%"#{query.nameLike}"%"
+  		</if>
+  		<if test="query.keyword != null">
+  			and (fullName like "%"#{query.keyword}"%" or id like "%"#{query.keyword}"%")
+  		</if>
+	  	<!-- <if test="query.isDeleted == 1"> -->
+  			and isDeleted = #{query.isDeleted}
+  		<!-- </if> -->
+  	</where>
+  	<choose>
+  		<when test="query.orderBy != null and query.orderBy != ''">
+  			ORDER BY ${query.orderBy}
+  		</when>
+  		<otherwise>
+  			ORDER BY createAt, id
+  		</otherwise>
+  	</choose>
+  </select>
+  
+	<insert id="insertIncremental" parameterType="org.zxs.leader.control.dao.model.PrjInfo">
+		insert into `prj_info`(
+	 		<include refid="prj_info_table_fields"/>
+		) VALUES (
+			<include refid="prj_info_model_properties"/>
+		) ON DUPLICATE KEY UPDATE
+			latest_year_id = #{latestYearId},
+			full_name = #{fullName},
+			short_name = #{shortName},
+			lng = #{lng},
+			lat = #{lat},
+			rsp_leader_id = #{rspLeaderId},
+			contact_leader_id = #{contactLeaderId},
+			contact_id = #{contactId},
+			type = #{type},
+			content = #{content},
+			total_invest = #{totalInvest},
+			actual_invest = #{actualInvest},
+			submit_org_id = #{submitOrgId},
+			industry = #{industry},
+			plan_status = #{planStatus},
+			actual_status = #{actualStatus},
+			area_id = #{areaId},
+			plan_start_dt = #{planStartDt},
+			actual_start_dt = #{actualStartDt},
+			plan_end_dt = #{planEndDt},
+			actual_end_dt = #{actualEndDt},
+			is_60th_welfare = #{is60thWelfare},
+			is_prvc_plan = #{isPrvcPlan},
+			owner_org_name = #{ownerOrgName},
+			remark = #{remark},
+			remark_display = #{remarkDisplay},
+			create_at = #{createAt},
+			update_at = now()
+	</insert>
+	
+	<delete id="deleteByIdList">
+		DELETE FROM prj_info where id in
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<update id="deleteByIdSoft" parameterType="int">
+		UPDATE prj_info SET is_deleted = 1 where id = #{prjInfoId};
+	</update>
+	
+	<update id="deleteByIdListSoft">
+		UPDATE prj_info SET is_deleted = 1 where id in
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<select id="selectAllSoft" resultType="org.zxs.leader.control.dao.model.PrjInfo">
+		SELECT * FROM prj_info WHERE is_deleted = 0;
+	</select>
+	
+	<select id="selectAllPrjInfoOptions" resultType="org.zxs.leader.control.dao.model.vo.output.OptionsOut">
+		SELECT full_name optText, id optValue
+		FROM prj_info
+		WHERE is_deleted = 0
+	</select>
+  
+</mapper>

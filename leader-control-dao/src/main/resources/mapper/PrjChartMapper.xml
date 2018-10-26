@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjChartMapper" >
+  
+  <sql id="Base_Column_List" >
+    c1.id id, c1.prj_type prjType, c1.chart_type chartType, c1.year year, c1.month month, c1.url url,
+    c1.create_at createAt, c1.update_at updateAt
+  </sql>
+  
+  <select id="selectPrjChartOne" parameterType="org.zxs.leader.control.dao.model.PrjChart" resultType="org.zxs.leader.control.dao.model.vo.output.PrjChartOut">
+  	SELECT <include refid="Base_Column_List"/>, c.years years
+  	FROM prj_chart c1 LEFT JOIN  (SELECT prj_type, chart_type, GROUP_CONCAT(distinct year) years FROM prj_chart
+  		GROUP BY prj_type, chart_type) c ON c.prj_type = c1.prj_type AND c.chart_type = c1.chart_type
+  		<choose>
+	  		<when test="pChart.year != null">
+	  			AND c1.year = #{pChart.year}
+	  		</when>
+	  		<otherwise>
+	  			AND c1.year = DATE_FORMAT(NOW(), '%Y')
+	  		</otherwise>
+	  	</choose>
+  		<if test="pChart.month != null">
+	  		AND c1.month = #{pChart.month}
+	  	</if>
+  	<where>
+	  	<if test="pChart.prjType != null">
+	  		c.prj_type = #{pChart.prjType}
+	  	</if>
+	  	<if test="pChart.chartType != null">
+	  		AND c.chart_type = #{pChart.chartType}
+	  	</if>
+  	</where>
+  	limit 1
+  </select>
+</mapper>

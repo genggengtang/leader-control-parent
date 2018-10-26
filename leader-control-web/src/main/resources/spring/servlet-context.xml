@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:cache="http://www.springframework.org/schema/cache"
+	   xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/cache
+        http://www.springframework.org/schema/cache/spring-cache.xsd">
+		
+	<mvc:annotation-driven >
+		<mvc:message-converters>  
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+                <property name="objectMapper">  
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">  
+                        <property name="dateFormat">  
+                            <bean class="java.text.SimpleDateFormat">  
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
+                            </bean>  
+                        </property>  
+                    </bean>  
+                </property>  
+            </bean>  
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+                <property name="supportedMediaTypes">
+                    <list>
+                        <bean class="org.springframework.http.MediaType">
+                            <constructor-arg index="0" value="text" />
+                            <constructor-arg index="1" value="plain" />
+                            <constructor-arg index="2" value="UTF-8" />
+                        </bean>
+                        <bean class="org.springframework.http.MediaType">
+                            <constructor-arg index="0" value="*" />
+                            <constructor-arg index="1" value="*" />
+                            <constructor-arg index="2" value="UTF-8" />
+                        </bean>
+                    </list>
+                </property>
+             </bean>
+        </mvc:message-converters> 
+		
+	</mvc:annotation-driven>
+	
+	<!-- 静态资源访问  --> 
+	<mvc:resources location="/admin/" mapping="/admin/**"/>
+	<mvc:resources location="/css/" mapping="/css/**"/>
+	<mvc:resources location="/tmpl/" mapping="/tmpl/**"/>
+	<mvc:resources location="/js/" mapping="/js/**"/> 
+	<mvc:resources location="/html/" mapping="/html/**"/>
+	<mvc:resources location="/layui/" mapping="/layui/**"/>
+	<mvc:resources location="/page/" mapping="/page/**"/>
+	<mvc:resources location="/images/" mapping="/images/**"/>
+	<mvc:resources location="/font/" mapping="/font/**"/>
+	<mvc:resources location="/json/" mapping="/json/**"/>
+	<mvc:resources location="/navs/" mapping="/navs/**"/> <!-- 左侧菜单栏分组JSON数据 -->
+	 
+	 <!-- 拦截器 -->
+	 <mvc:interceptors>
+	 
+	 	<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"/>
+	 	
+	    <mvc:interceptor>
+	        <mvc:mapping path="/tables/"/>
+	        <mvc:mapping path="/tables/**"/>
+	        <bean class="org.zxs.leader.control.admin.interceptor.AuthGroupInterceptor"/>
+	    </mvc:interceptor>
+	    
+	    <mvc:interceptor>
+	        <mvc:mapping path="/**"/>
+	        <bean class="org.zxs.leader.control.controller.interceptor.AuthorizationInterceptor"/>
+	    </mvc:interceptor>
+	    
+	    <mvc:interceptor>
+	        <mvc:mapping path="/**"/>
+	        <bean class="org.zxs.leader.control.controller.interceptor.TraceInterceptor"/>
+	    </mvc:interceptor>
+	    
+	    <mvc:interceptor>
+	        <mvc:mapping path="/**"/>
+	        <bean class="org.zxs.leader.control.controller.interceptor.JsonParamInterceptor"/>
+	    </mvc:interceptor>
+	    
+	    <mvc:interceptor> 
+			<mvc:mapping path="/admin/auth/**"/>    
+	        <!-- 登录拦截类 -->  
+	        <bean id="loginInterceptor" class="org.zxs.base.filter.SessionTimeoutInterceptor">
+	        	<constructor-arg name="sessionName" value="admin"/>  
+			    <constructor-arg name="allowUrls">  
+			        <list>  
+			            <!-- <value>soldier</value>  
+			            <value>scientist</value>  
+			            <value>pilot</value> -->  
+			        </list>  
+			    </constructor-arg>
+	        </bean>  
+	     </mvc:interceptor>
+	    
+	</mvc:interceptors>
+	
+	<bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">    
+     <property name="exceptionMappings">    
+       <props>
+       	 <prop key="org.zxs.base.filter.SessionTimeoutException">redirect:../login.html</prop>  
+       </props>    
+     </property>    
+   </bean>
+	
+	<!-- 自定义注解 -->
+	<bean id="freemarkConfig" class="org.springframework.beans.factory.config.PropertiesFactoryBean">  
+        <property name="location" value="classpath:freemarker.properties"/>  
+    </bean>
+	 <!-- FreeMarker视图解析器  -->
+    <bean id="freemarkerResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="order" value="1" />
+        <property name="suffix" value=".ftl" />
+        <property name="contentType" value="text/html;charset=utf-8" />
+        <property name="viewClass">
+            <value>org.springframework.web.servlet.view.freemarker.FreeMarkerView</value>
+        </property>
+    </bean>
+	 
+	 <!-- freemarker的配置 -->  
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPaths">
+        	<list>
+        		<value>/tmpl/</value>
+        	</list>
+        </property>
+        <property name="freemarkerSettings"><!-- 设置FreeMarker环境属性 -->
+            <props>
+                <prop key="template_update_delay">5</prop><!-- 刷新模板的周期，单位为秒 -->
+                <prop key="default_encoding">UTF-8</prop><!-- 模板的编码格式 -->
+                <prop key="locale">UTF-8</prop><!-- 本地化设置 -->
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <prop key="time_format">HH:mm:ss</prop>
+                <prop key="number_format">0.####</prop>
+                <prop key="boolean_format">true,false</prop>
+                <prop key="whitespace_stripping">true</prop>
+                <prop key="tag_syntax">auto_detect</prop>
+                <prop key="url_escaping_charset">UTF-8</prop>
+            </props>
+        </property>
+    </bean> 
+    
+    <!-- <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		配置jsp文件的前缀和后缀
+		<property name="prefix" value="/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean> -->
+	
+	<bean id="commonConfig" class="org.zxs.leader.control.controller.bean.CommonConfig">
+		<property name="serverPre" value="${server.pre}"/>
+	</bean>
+	
+	<bean id="socketioConf" class="com.corundumstudio.socketio.Configuration">
+		<property name="hostname" value="${socketio.hostname}"/>
+		<property name="port" value="${socketio.port}"/>
+	</bean>
+	
+	<bean id="socketioServer" class="com.corundumstudio.socketio.SocketIOServer">
+		<constructor-arg ref="socketioConf"/>
+	</bean>
+	
+    <!-- 支持上传文件 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:defaultEncoding="UTF-8"/>
+	
+	<context:annotation-config/>
+	<context:component-scan base-package="org.zxs.leader.control" >
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+	
+	<import resource="classpath*:spring/*application.xml"/>
+	
+	<mvc:resources location="classpath:/META-INF/resources/" mapping="swagger-ui.html"/>
+	<mvc:resources location="classpath:/META-INF/resources/webjars/" mapping="/webjars/**"/>
+	<mvc:resources mapping="/dist/**" location="/dist/" cache-period="31556926" />
+	
+	<!-- <task:annotation-driven/> -->
+<!-- 	
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>  
+   --> 
+	
+	<!--启用缓存注解-->
+    <!-- <cache:annotation-driven cache-manager="cacheManager"/>
+    <bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath*:spring/ehcache.xml"/>
+    </bean>
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="cacheManagerFactory"/>
+    </bean> -->
+    
+    <!-- redis -->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxIdle" value="100" />  
+        <property name="maxTotal" value="200" />  
+        <property name="maxWaitMillis" value="100" />  
+        <property name="testOnBorrow" value="true" />  
+    </bean>
+    
+    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"  
+        p:host-name="${redis.host}" p:port="${redis.port}" p:password="${redis.password}"  p:pool-config-ref="poolConfig"/>  
+    
+    <!-- <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
+        <property name="connectionFactory"   ref="connectionFactory" />  
+    </bean> -->
+    
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">  
+        <!-- 注入连接工厂 -->  
+        <property name="connectionFactory" ref="connectionFactory" />  
+        <!-- 配置key序列化类 -->  
+        <property name="keySerializer">  
+            <bean  
+                class="org.springframework.data.redis.serializer.StringRedisSerializer" />  
+        </property>  
+        <!-- 配置value序列化类 -->  
+        <property name="valueSerializer">  
+            <bean  
+                class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />  
+        </property>  
+    </bean>
+
+</beans>

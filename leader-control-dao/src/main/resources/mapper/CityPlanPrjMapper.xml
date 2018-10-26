@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.ICityPlanPrjMapper" >
+  
+  <!-- <sql id="Base_Column_List" >
+    id, name, type, label, content, plan_start_year, plan_end_year, plan_start_month, plan_end_month,
+    plan_status, invest_source, plan_invest_total, area, area_admin, pjr_db_id, prj_db_no, 
+    is_prj_db, remark, create_at
+  </sql> -->
+  
+  <sql id="Base_Column_List" >
+    p.id id, p.name name, p.type type, p.label label, p.content content, p.plan_start_year planStartYear, p.plan_end_year planEndYear, p.plan_start_month planStartMonth, p.plan_end_month planEndMonth,
+    p.plan_status planStatus, p.invest_source investSource, p.plan_invest_total planInvestTotal, p.area area, p.area_admin areaAdmin, p.prj_db_id prjDbId, p.prj_db_no prjDbNo, 
+    p.is_prj_db isPrjDb, p.remark remark, p.remark_display remarkDisplay, p.create_at createAt, y.plan_invest yearPlanInvest, 
+    GROUP_CONCAT(distinct u.full_name) ownerName, d1.value_remark planStatusDis,GROUP_CONCAT(distinct d2.short_remark) labels
+  </sql>
+  
+  <sql id="Base_Table_List" >
+    city_plan_prj p LEFT JOIN prj_year_plan y ON p.latest_year_id = y.id
+   	LEFT JOIN cp_prj_org o ON p.id = o.cp_prj_id and o.prj_type = 21402 and o.relate_type = 21201
+   	LEFT JOIN org_unit u ON o.org_id = u.id
+   	LEFT JOIN org_user s ON o.org_id = s.org_id
+   	LEFT JOIN dic_info d1 ON p.plan_status = d1.id
+   	LEFT JOIN dic_info d2 ON find_in_set(d2.id, p.label)
+  </sql>
+  
+  <select id="selectListInfo" parameterType="org.zxs.leader.control.dao.model.vo.query.CpPrjPageQuery"
+  		resultType="org.zxs.leader.control.dao.model.vo.output.CpPrjPageOut">
+  	SELECT <include refid="Base_Column_List"/>
+    FROM <include refid="Base_Table_List"/>
+    <where>
+    	<if test="query.planStatus != null">
+    		p.plan_status = #{query.planStatus}
+    	</if>
+    	<if test="query.industry != null">
+    		and p.type = #{query.industry}
+    	</if>
+    	<if test="query.nameLike != null">
+    		and (p.name like "%"#{query.nameLike}"%" or u.full_name like "%"#{query.nameLike}"%")
+    	</if>
+    	<if test="query.areaAdmin != null">
+    		and p.area_admin = #{query.areaAdmin}
+    	</if>
+    	<if test="query.labels != null">
+    		<foreach collection="query.labels" item="item" open=" and (" close=")" separator=" or ">
+    			find_in_set(#{item}, p.label)
+    		</foreach>
+    	</if>
+    	<if test="query.ownerUserId != null">
+    		and s.id = #{query.ownerUserId} and s.level = 6
+    	</if>
+    </where>
+    GROUP BY p.id
+    ORDER BY #{query.orderBy}
+  </select>
+  
+  <select id="selectDetailById" parameterType="int" resultType="org.zxs.leader.control.dao.model.vo.output.CpPrjDetailOut">
+  	SELECT <include refid="Base_Column_List"/>, y.year year, y.pre_content preContent, y.plan_content yearContent, y.accm_actual_invest accmActualInvest,
+  		GROUP_CONCAT(distinct a1.name) areaName, a2.short_name areaAdminName, GROUP_CONCAT(distinct u2.full_name) rspName,
+  		d3.value_remark industryName, if(y.plan_invest = 0, 0, y.accm_actual_invest * 100 DIV y.plan_invest) completeRateByYear
+    FROM <include refid="Base_Table_List"/>
+	    LEFT JOIN cp_prj_org o2 ON p.id = o2.cp_prj_id and o2.prj_type = 21402 and o2.relate_type = 21202
+	   	LEFT JOIN org_unit u2 ON o2.org_id = u2.id
+    	LEFT JOIN area_nn a1 ON find_in_set(a1.id, p.area)
+    	LEFT JOIN area_nn a2 ON p.area_admin = a2.id
+    	LEFT JOIN dic_info d3 ON p.type = d3.id
+    WHERE p.id = #{id}
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CityPlanPrjRow">
+  	SELECT c.*, IFNULL(c.is_deleted, 0) isDeleted, d1.value_remark typeTrans, d2.value_remark labelTrans, d3.value_remark planStatusTrans, n.name areaAdminTrans
+  	FROM city_plan_prj c
+  	LEFT JOIN dic_info d1 ON c.type = d1.id
+  	LEFT JOIN dic_info d2 ON c.label = d2.id
+  	LEFT JOIN dic_info d3 ON c.plan_status = d3.id
+  	LEFT JOIN area_nn n ON c.area_admin = n.id
+  	WHERE c.is_deleted = 0 OR c.is_deleted IS NULL
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.CityPlanPrjRow">
+  	SELECT c.*, IFNULL(c.is_deleted, 0) isDeleted, d1.value_remark typeTrans, d2.value_remark labelTrans, d3.value_remark planStatusTrans, n.name areaAdminTrans
+  	FROM city_plan_prj c
+  	LEFT JOIN dic_info d1 ON c.type = d1.id
+  	LEFT JOIN dic_info d2 ON c.label = d2.id
+  	LEFT JOIN dic_info d3 ON c.plan_status = d3.id
+  	LEFT JOIN area_nn n ON c.area_admin = n.id
+  	WHERE (c.is_deleted = 0 OR c.is_deleted IS NULL)
+  	AND
+  	(
+  	c.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.type LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.label LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.content LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.plan_start_year LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.plan_end_year LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.plan_start_month LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.plan_end_month LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.plan_status LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.invest_source LIKE CONCAT('%',#{keyword},'%')
+	OR
+	c.plan_invest_total LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d1.value_remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d2.value_remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d3.value_remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+	n.name LIKE CONCAT('%',#{keyword},'%')
+  	)
+  </select>
+  
+</mapper>

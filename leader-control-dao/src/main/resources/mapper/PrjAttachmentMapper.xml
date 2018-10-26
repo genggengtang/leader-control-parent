@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IPrjAttachmentMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.PrjAttachment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="prj_id" property="prjId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+  </resultMap> -->
+  <!-- <sql id="Base_Column_List" >
+    id, prj_id, name, url, create_at
+  </sql> -->
+  
+  <select id="selectByPrjAndUser" resultType="org.zxs.leader.control.dao.model.vo.output.MyMeetingNoteOut">
+  	SELECT a.prj_id prjId, a.mn_id id, n.title title, n.name name, n.url url, f.id favoriteId
+  	FROM prj_attachment a LEFT JOIN meeting_note n ON a.mn_id = n.id
+  		LEFT JOIN favorite_note f ON a.mn_id = f.note_id AND f.user_id = #{userId}
+  	WHERE a.prj_id = #{prjId} and a.prj_type = #{prjType}
+  	ORDER BY n.create_at desc
+  </select>
+  
+  <select id="selectByPrjAndType" resultType="org.zxs.leader.control.dao.model.MeetingNote">
+  	SELECT n.title title, n.name name, n.url url
+  	FROM prj_attachment a LEFT JOIN meeting_note n ON a.mn_id = n.id
+  	WHERE a.prj_id = #{prjId} and a.prj_type = #{prjType}
+  	ORDER BY n.create_at desc
+  </select>
+  
+  <select id="selectAllOuts" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjAttachmentRow">
+  	SELECT p.*, d.value_remark prjTypeTrans, i.full_name prjIdTrans, m.title mnIdTrans
+	FROM prj_attachment p
+	LEFT JOIN dic_info d ON p.prj_type = d.id
+	LEFT JOIN prj_info i ON p.prj_id = i.id
+	LEFT JOIN meeting_note m ON p.mn_id = m.id
+  </select>
+  
+  <select id="selectRowsByKeyword" parameterType="String" resultType="org.zxs.leader.control.dao.model.vo.output.rows.PrjAttachmentRow">
+  	SELECT p.*, d.value_remark prjTypeTrans, i.full_name prjIdTrans, m.title mnIdTrans
+	FROM prj_attachment p
+	LEFT JOIN dic_info d ON p.prj_type = d.id
+	LEFT JOIN prj_info i ON p.prj_id = i.id
+	LEFT JOIN meeting_note m ON p.mn_id = m.id
+	WHERE (
+	p.id LIKE CONCAT('%',#{keyword},'%')
+	OR
+	d.value_remark LIKE CONCAT('%',#{keyword},'%')
+	OR
+	i.full_name LIKE CONCAT('%',#{keyword},'%')
+	OR
+	m.title LIKE CONCAT('%',#{keyword},'%')
+	)
+  </select>
+  
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IMsgStatusMapper" >
+  <!-- <resultMap id="BaseResultMap" type="org.zxs.leader.control.dao.model.MsgStatus" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="group_msg_id" property="groupMsgId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="read_status" property="readStatus" jdbcType="TINYINT" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="update_at" property="updateAt" jdbcType="TIMESTAMP" />
+  </resultMap> -->
+  <sql id="Base_Column_List" >
+    id, group_msg_id, user_id, read_status, create_at, update_at
+  </sql>
+  
+  <update id="updateByMsgIdAndUserId">
+  	UPDATE msg_status
+  	SET read_status = 1, push_status = 1, update_at = now()
+  	WHERE group_msg_id = #{msgId} AND user_id = #{userId}
+  </update>
+  
+  <update id="updateByCgIdAndUserId">
+  	UPDATE msg_status s LEFT JOIN chat_group_msg m ON s.group_msg_id = m.id
+  	SET s.read_status = 1, s.update_at = now()
+  	WHERE m.chat_group_id = #{cgId} AND s.user_id = #{userId}
+  	AND s.read_status = 0
+  </update>
+  
+  <select id="selectUnreadCount" resultType="org.zxs.leader.control.dao.model.vo.output.ChatGroupSimpleOut">
+  	SELECT i.id id, i.group_name groupName, DATE_FORMAT(i.create_at, "%Y-%m-%d %h:%i:%s") createAt, ifnull(m.cnt,0) unreadNum, g.create_at lastAt,
+  		i.enable_remove enableRemove, i.enable_name_update enableNameUpdate, c.nickname createName
+  	FROM (SELECT chat_group_id, max(create_at) create_at FROM chat_group_msg GROUP BY chat_group_id) g
+  		LEFT JOIN chat_group_info i ON g.chat_group_id = i.id
+  		LEFT JOIN chat_group_user u ON i.id = u.chat_group_id
+  		LEFT JOIN chat_group_user c ON i.id = c.chat_group_id and c.role = 0
+  		LEFT JOIN (SELECT chat_group_id, user_id, count(id) cnt FROM msg_status
+  		WHERE read_status = 0 GROUP BY chat_group_id,user_id) m ON i.id = m.chat_group_id and u.user_id = m.user_id
+  	WHERE u.user_id = #{userId} AND g.chat_group_id != 0
+	ORDER BY lastAt desc
+  </select>
+</mapper>

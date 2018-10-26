@@ -1,0 +1,432 @@
+
+<style>
+    #detailBox{position: absolute;top: 50px;left: 40%;width: 320px;border:solid black 1px;background: black;display: none;}
+    #detailBox img{display: block;max-width: 80%;margin-left: 10%;}
+    #detailBoxTop{background: black;color: white;text-align: center;height: 40px;font-size: 20px;padding-top: 5px;}
+    #detailBoxTop i{margin:5px 10px 0 0;color: red;font-size: 20px;}
+    #detailBoxBody{background: white;height: 528px;padding-top: 10px;overflow-y:scroll; }
+    #detailBoxBody p{text-indent: 28px;}
+    #detailBoxFooter{padding: 5px 0;border-top: solid 1px black;text-align: center;background: black;color: white;}
+    #detailBoxFooter i{font-size: 30px;margin-right: 20px;}
+    .backDetail{margin-left: 20px;}
+    #detailBoxFooter button{width: 30px;height: 20px;margin-top: 5px;}
+    
+    #tableArea .dataTables_wrapper {
+	  position: relative;
+	  clear: both;
+	  zoom: 1;
+	  overflow-x: auto;
+	}
+	
+	#tableArea table{
+	  width: 100%;
+	  white-space: nowrap;/*文本不换行*/
+	}
+	
+	/* th{
+            white-space: nowrap;   /** 让表格不换行，并且根据文字进行自动拉伸表格宽度 **/
+            padding: 5px;
+        } */
+    #tableArea table th{
+    	color:black;
+	}
+        
+</style>
+
+<div class="col-md-12 col-xs-12">
+    <div class="x_panel" id="ldPrjPanel">
+        <div class="x_title">
+            <h2>市领导联系项目</h2>
+            <ul class="nav navbar-right panel_toolbox">
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="col-md-12">
+            <div>
+                <button class="btn btn-success">新增</button>
+            </div>
+            <div id="tableArea">
+	            <table id="ld_prj_table" class="table table-bordered jambo_table" data-upd="ld-prj-update">
+	                <thead>
+	                <tr>
+	                	<th name="id">
+	                        编号
+	                    </th>
+	                    <th name="fullName">
+	                        项目名称 *
+	                    </th>
+	                    <th name="rspLeaderId">
+	                       责任市领导*
+	                    </th>
+	                    <th name="content">
+	                        项目内容
+	                    </th>
+	                    <th name="totalInvest">
+	                        计划总投资 *
+	                    </th>
+	                    <th name="actualInvest">
+	                        实际总投资 *
+	                    </th>
+	                    <th name="type">
+	                        推进难度 *
+	                    </th>
+	                    <th name="industry">
+	                        行业 *
+	                    </th>
+	                    <th name="areaId">
+	                        区域
+	                    </th>
+	                    <th name="lng">
+	                        经度 *
+	                    </th>
+	                    <th name="lat">
+	                        纬度 *
+	                    </th>
+	                    <th name="planStatus">
+	                        计划建设阶段 *
+	                    </th>
+	                    <th name="actualStatus">
+	                        实际建设阶段 *
+	                    </th>
+	                    <th name="planStartDt">
+	                        计划开工日期 *
+	                    </th>
+	                    <th name="planEndDt">
+	                        计划竣工日期 *
+	                    </th>
+	                    <th name="actualEndDt">
+	                        实际开工日期 *
+	                    </th>
+	                    <th name="actualEndDt">
+	                        实际竣工日期 *
+	                    </th>
+	                    <th name="is60thWelfare">
+	                        是否60周年 *
+	                    </th>
+	                    <th name="isPrvcPlan">
+	                        是否区统筹 *
+	                    </th>
+	                    <th name="latestYearId">
+	                        关联的年记录 *
+	                    </th>
+	                    <th name="createAt">
+	                        记录时间 *
+	                    </th>
+	                    <th name="remark">
+	                        备注 *
+	                    </th>
+	                    <th name="id">
+	                        操作
+	                    </th>
+	                </tr>
+	                </thead>
+	                
+	                <tbody>
+	
+	                </tbody>
+	            </table>
+	            
+	            <table class="table" style ="margin-top:5px;color:black;">
+	            	<tfoot>
+			            <tr>
+			                <th style="color:red;">
+	                        显示/隐藏列:
+	                    </th>
+	                    <th class="toggle-vis" data-column="1">
+	       	项目名称
+	                    </th>
+	                    <th class="toggle-vis" data-column="2">
+	                        责任市领导
+	                    </th>
+	                    <th class="toggle-vis" data-column="3">
+	                        项目内容
+	                    </th>
+	                    <th class="toggle-vis" data-column="4">
+	                        计划总投资
+	                    </th>
+	                    <th class="toggle-vis" data-column="5">
+	                        实际总投资
+	                    </th>
+			                <th class="toggle-vis" data-column="6">
+	                        推进难度
+	                    </th>
+	                    <th class="toggle-vis" data-column="7">
+	                        行业
+	                    </th>
+	        </tr>
+            <tr>
+            <th></th>
+	                    <th class="toggle-vis" data-column="8">
+	                        区域
+	                    </th>
+	                    <th class="toggle-vis" data-column="17">
+	                        经度
+	                    </th>
+	                    <th class="toggle-vis" data-column="18">
+	                        纬度
+	                    </th>
+	                    <th class="toggle-vis" data-column="9">
+	                        计划建设阶段
+	                    </th>
+	                    <th class="toggle-vis" data-column="10">
+	                        实际建设阶段
+	                    </th>
+	                    <th class="toggle-vis" data-column="11">
+	                        计划开工日期
+	                    </th>
+	                    <th class="toggle-vis" data-column="12">
+	                        计划竣工日期
+	                    </th>
+	        </tr>
+            <tr>
+            	<th></th>
+            	<th class="toggle-vis" data-column="13">
+	                        实际开工日期
+	                    </th>
+	                    <th class="toggle-vis" data-column="14">
+	                        实际竣工日期
+	                    </th>
+            	<th class="toggle-vis" data-column="15">
+	                        是否60周年
+	                    </th>
+	                    <th class="toggle-vis" data-column="16">
+	                        是否区统筹
+	                    </th>
+	                    
+	                    <th class="toggle-vis" data-column="19">
+	                        关联的年记录
+	                    </th>
+	                    <th class="toggle-vis" data-column="20">
+	                        记录时间
+	                    </th>
+	                    <th class="toggle-vis" data-column="21">
+	                        备注
+	                    </th>
+			                
+			            </tr>
+			        </tfoot>
+	            </table>
+	        </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="dataTemp">
+
+</div>
+
+<div id="contentModal" class="modal hide fade">
+   <div class="modal-body">
+    <div id="contentDiv"></div>
+   </div>
+</div>
+
+<div id="detailBox">
+    <div id="detailBoxTop">
+        详情查看<i class="fa fa-times-circle pull-right" onclick="$(this).parent().parent().hide();"></i>
+    </div>
+    <div id="detailBoxBody">
+
+    </div>
+    <div id="detailBoxFooter">
+        <i class="fa fa-caret-left backDetail pull-left"></i>
+        <button class="btn"></button>
+        <i class="fa fa-reorder pull-right"></i>
+    </div>
+</div>
+
+<div id="optionData" style="display:none;">
+   <input class="leader_list" type = "hidden"/>
+   <input class="build_status_list" type = "hidden"/>
+   <input class="industry_list" type = "hidden"/>
+   <input class="area_list" type = "hidden"/>   
+</div>
+
+<script>
+	
+    var ld_prj_dt_config = dtConfig(
+            "../ld-prj-page",
+            function (aoData) {
+		        //aoData.push({name: "type", value: ""});
+		    },
+		    [{
+                "mDataProp" : "id"
+                /* ,"render": function (data, type, full, meta) {
+                    return '<input type="checkbox" class="checkchild"/>';
+                } */
+            },{
+                "mDataProp" : "fullName",
+                "sClass": "edittext"
+            },{
+                "mDataProp" : "rspLeaderName",
+                "sClass": "edittrans",
+				"render": function (data, type, full, meta) {
+					if(null == data)
+						data = '';
+                    return '<input type="hidden" value="' + full.rspLeaderId + '" data-related="leader_list"/>' + '<span>' + data + '</span>';
+                }
+            },{
+                "mDataProp" : "content",
+            	"bSortable": false,
+            	"render": function (data, type, full, meta) {
+                    
+                    if (data) {
+                    	var showdata = data;
+                    	if (data.length > 10) {
+                    		showdata = data.substring(0, 10) + " ...";
+                    	}
+                    	return '<div data-toggle="tooltip"  title="' + data + '" style="text-decoration:underline">' + showdata + '</div>';
+                    	} else {
+                    	return '--';
+                    	}
+                }
+        	},{
+                "mDataProp" : "totalInvest",
+            	"bSortable": false,
+            	"sClass": "editnum"
+        	},{
+                "mDataProp" : "actualInvest",
+            	"bSortable": false,
+            	"sClass":"editnum"
+        	},{
+                "mDataProp" : "type",
+                "bSortable": false,
+                "sClass":"editnum"
+            },{
+                "mDataProp" : "industryDis",
+                "sClass": "edittrans",
+				"render": function (data, type, full, meta) {
+					if(null == data)
+						data = '';
+                    return '<input type="hidden" value="' + full.industry + '" data-related="industry_list"/>' + '<span>' + data + '</span>';
+                }
+            },{
+                "mDataProp" : "areaName",
+                "bSortable": false
+            },{
+                "mDataProp" : "lng",
+                "bSortable": false,
+                "sClass":"editnum"
+            },{
+                "mDataProp" : "lat",
+                "bSortable": false,
+                "sClass":"editnum"
+            },{
+                "mDataProp" : "planStatusDis",
+                "bSortable": false,
+                "sClass": "edittrans",
+				"render": function (data, type, full, meta) {
+					if(null == data)
+						data = '';
+                    return '<input type="hidden" value="' + full.planStatus + '" data-related="build_status_list"/>' + '<span>' + data + '</span>';
+                }
+            },{
+            	"mDataProp" : "actualStatusDis",
+            	"bSortable": false,
+            	"sClass": "edittrans",
+				"render": function (data, type, full, meta) {
+					if(null == data)
+						data = '';
+                    return '<input type="hidden" value="' + full.actualStatus + '" data-related="build_status_list"/>' + '<span>' + data + '</span>';
+                }
+            },{
+                "mDataProp" : "planStartDt",
+                "sClass":"editdate"
+            },{
+                "mDataProp" : "planEndDt",
+                "sClass":"editdate"
+            },{
+                "mDataProp" : "actualStartDt",
+                "sClass":"editdate"
+            },{
+                "mDataProp" : "actualEndDt",
+                "sClass":"editdate"
+            },{
+                "mDataProp" : "is60thWelfare",
+                "bSortable": false,
+                "sClass":"editnum"
+            },{
+                "mDataProp" : "isPrvcPlan",
+                "bSortable": false,
+                "sClass":"editnum"
+            },{
+                "mDataProp" : "latestYearId",
+                "bSortable": false,
+                "sClass":"editnum"
+            },{
+                "mDataProp" : "createAt",
+                "sClass":"edittime"
+            },{
+                "mDataProp" : "remark",
+                "sClass":"edittext"
+            },{
+                "mDataProp" : "id",
+                "bSortable": false, 
+                "render": function (data, type, full, meta) {
+                	return '<button class="btn-danger edit" onclick="del('+data+')">删除</button>';
+                }
+            }]
+		    /* ,function(){ // 添加序号
+		        var api = this.api();
+		        var startIndex= api.context[0]._iDisplayStart;//获取到本页开始的条数
+		        api.column(0).nodes().each(function(cell, i) {
+		            cell.innerHTML =  startIndex + i + 1;
+		        });
+		    } */
+		    ,function(){}
+		    );
+    
+    function prefunc(obj){
+    	alert(1);
+    	return false;
+    }
+
+    var oTable;
+    $(document).ready(function() {
+    	oTable = $('#ld_prj_table').DataTable(
+                ld_prj_dt_config
+        );
+        
+    	$('th.toggle-vis').on( 'click', function (e) {
+            e.preventDefault();
+     
+            // Get the column API object
+            var column = oTable.column( $(this).attr('data-column') );
+     
+            // Toggle the visibility
+            column.visible( ! column.visible() );
+            if($(this).attr("style") == 'color:#73879c;'){
+            	$(this).removeAttr('style');
+            }else{
+            	$(this).attr('style','color:#73879c;');
+            }
+            
+        } );
+    	
+    	$('.pop-sample').popover();
+    	
+    	$("[data-toggle='popover']").popover();
+    	
+        /* $('.newOriginal').click(function(){
+        	$('#originalPanel').load('../html/admin/original_add.html');
+        }); */
+        
+        // 获取各字段选项值列表
+    	$.ajax({
+            type: "GET",
+            url: "../ld-prj-options",
+            success: function(data) {
+                $('.leader_list').val(JSON.stringify(data.leaderList));
+                $('.build_status_list').val(JSON.stringify(data.buildStatusList));
+                $('.industry_list').val(JSON.stringify(data.industryList));
+                $('.area_list').val(JSON.stringify(data.areaList));
+            }, error: function(xhr, msg) {
+            	console.log(msg);
+            }
+        });
+    });
+    
+    
+</script>

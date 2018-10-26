@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.zxs.leader.control.dao.interf.IDictHeaderMapper" >
+
+	<sql id="base_column_list" >
+		id, table_name, eng_col_name, chn_col_name, is_required, field_type, web_order, 
+		web_displayed, align, excel_order, excel_displayed, min_width
+	</sql>
+	
+	<select id="getExcelHeadersByTableName" parameterType="string" resultType="org.zxs.leader.control.dao.model.DictHeader">
+		SELECT <include refid="base_column_list"/>
+		FROM dict_header
+		WHERE table_name = #{tableName} AND excel_displayed = 1;
+	</select>
+	
+	<select id="getWebHeadersByTableName" parameterType="string" resultType="org.zxs.leader.control.dao.model.DictHeader">
+		SELECT <include refid="base_column_list"/>
+		FROM dict_header
+		WHERE table_name = #{tableName} AND web_displayed = 1;
+	</select>
+	
+	<select id="getHeaderByTableNameAndEngName" parameterType="string" resultType="org.zxs.leader.control.dao.model.DictHeader">
+		SELECT <include refid="base_column_list"/>
+		FROM dict_header
+		WHERE table_name = #{0} AND eng_col_name = #{1};
+	</select>
+	
+</mapper>

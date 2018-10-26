@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>项目列表--后台管理系统</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+		<link rel="stylesheet" href="../../css/public.css" media="all" />
+		<script type="text/javascript" src="../../layui/layui.js"></script>
+		<script type="text/javascript" src="projectAdd.js"></script>
+		<style>
+			#formAll .layui-form-label {
+				width: 90px;
+			}
+			
+			#formAll .layui-textarea,
+			#formAll .fullName {
+				width: calc(100% - 30px);
+			}
+			
+			#formAll .layui-unselect:first-child {
+				width: calc(100% - 30px);
+			}
+			
+			#formAll .layui-form-select .layui-edge {
+				right: 30px;
+			}
+		</style>
+	</head>
+
+	<body class="childrenBody">
+		<form class="layui-form" action="" id="formAll">
+			<!-- hidden -->
+			<div class="layui-form-item" style="display: none;">
+				<label class="layui-form-label">ID</label>
+				<div class="layui-input-block">
+					<input id="id" type="text" class="layui-input">
+				</div>
+			</div>
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label"><span style="color:red">*</span>项目名称</label>
+					<div class="layui-input-inline">
+						<input id="fullName" type="text" class="layui-input" lay-verify="required" placeholder="请输入项目名称">
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label"><span style="color:red">*</span>责任市领导</label>
+					<div class="layui-input-block">
+						<select id="selectLeader" name="interest" lay-filter="aihao" lay-verify="required">
+							<option value=""></option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label"><span style="color:red">*</span>行业</label>
+					<div class="layui-input-block">
+						<select id="industryDis" name="interest" lay-verify="required">
+							<option value=""></option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label"><span style="color:red">*</span>计划建设阶段</label>
+					<div class="layui-input-block">
+						<select name="interest" id="planStatusDis" lay-verify="required">
+							<option value=""></option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">实际建设阶段</label>
+					<div class="layui-input-block">
+						<select name="interest" id="actualStatusDis">
+							<option value=""></option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color:red">*</span>是否60周年</label>
+				<div class="layui-input-block">
+					<input type="checkbox" name="close" lay-skin="switch" lay-text="是|否" id="is60thWelfare">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color:red">*</span>是否区统筹</label>
+				<div class="layui-input-block">
+					<input type="checkbox" name="close" lay-skin="switch" lay-text="是|否" id="isPrvcPlan">
+				</div>
+			</div>						
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">计划总投资</label>
+					<div class="layui-input-inline">
+						<input type="text" name="number" lay-verify="isNumber" autocomplete="off" class="layui-input" id="totalInvest">
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">实际总投资</label>
+					<div class="layui-input-inline">
+						<input type="text" autocomplete="off" name="isNumber" lay-verify="number" class="layui-input" id="actualInvest">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">推荐难度</label>
+					<div class="layui-input-inline">
+						<input type="text" autocomplete="off" name="isNumber0" lay-verify="isNumber0" class="layui-input" id="type">
+					</div>
+				</div>				
+				<div class="layui-inline">
+					<label class="layui-form-label">经度</label>
+					<div class="layui-input-inline">
+						<input type="text" autocomplete="off" name="isNumber" lay-verify="isNumber" class="layui-input" id="lng">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">纬度</label>
+					<div class="layui-input-inline">
+						<input type="text" autocomplete="off" name="isNumber" lay-verify="isNumber" class="layui-input" id="lat">
+					</div>
+				</div>				
+				<div class="layui-inline">
+					<label class="layui-form-label">计划开工日期</label>
+					<div class="layui-input-inline">
+						<input type="text" id="planStartDt" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">计划竣工日期</label>
+					<div class="layui-input-inline">
+						<input type="text" id="planEndDt" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">实际开工日期</label>
+					<div class="layui-input-inline">
+						<input type="text" id="actualStartDt" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">实际竣工日期</label>
+					<div class="layui-input-inline">
+						<input type="text" id="actualEndDt" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">关联的年记录</label>
+					<div class="layui-input-inline">
+						<input type="text" id="latestYearId" autocomplete="off" name="isNumber" lay-verify="isNumber" class="layui-input">
+					</div>
+				</div>
+				<!-- <div class="layui-inline">
+					<label class="layui-form-label">记录时间</label>
+					<div class="layui-input-inline">
+						<input type="text" id="createAt" autocomplete="off" placeholder="yyyy-MM-dd" lay-verify="required" class="layui-input">
+					</div>
+				</div> -->
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color:red">*</span>区域</label>
+				<div class="layui-input-block" id="areaName">
+				</div>
+			</div>
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">备注</label>
+				<div class="layui-input-block">
+					<textarea placeholder="请输入备注" class="layui-textarea" id="remark"></textarea>
+				</div>
+			</div>
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><span style="color:red">*</span>项目内容</label>
+				<div class="layui-input-block">
+					<textarea placeholder="请输入内容" class="layui-textarea" id="content" lay-verify="required"></textarea>
+				</div>
+			</div>
+			<!--<div class="layui-form-item layui-form-text">
+    <label class="layui-form-label">编辑器</label>
+    <div class="layui-input-block">
+      <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="LAY_demo_editor"></textarea>
+    </div>
+  </div>-->
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button id="updatePrjInfoButton" class="layui-btn" lay-submit="" lay-filter="updateProjectInfo">修改</button>
+					<button id="createPrjInfoButton" class="layui-btn" lay-submit="" lay-filter="createProjectInfo">添加</button>
+					<!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+				</div>
+			</div>
+		</form>
+	</body>
+
+</html>
